@@ -1,0 +1,76 @@
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+#instruction, #confirmation, #questions, #endScreen {
+  text-align: center;
+  width: 70%;
+  display: none;
+}
+#instruction.visible, #confirmation.visible, #questions.visible, #endScreen.visible {
+  display: block;
+}
+#arenaContainer {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  background: #222;
+  position: relative;
+}
+#arena {
+  position: absolute;
+  border: 3px solid white;
+  border-radius: 50%;
+  width: 600px;
+  height: 600px;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.image {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  cursor: grab;
+  border-radius: 10px;
+}
+.question-btn {
+  background: #444;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  margin: 10px;
+  cursor: pointer;
+}
+.question-btn:hover {
+  background: #666;
+}
+#timerDisplay {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  color: white;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 5px;
+}
+#timerDisplay p {
+  margin: 5px 0;
+}
+#arenaText {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 20px;
+}

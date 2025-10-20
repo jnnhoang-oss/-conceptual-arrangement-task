@@ -1,0 +1,99 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Conceptual Arrangement Task</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="instruction" class="visible">
+    <h1>Conceptual Arrangement Task</h1>
+    <p>Thank you for participating!</p>
+    <p>In this experiment, you will use the mouse or touch to drag images around the screen. Press the <b>spacebar</b> or <b>tap the screen</b> to start. A set of images will appear on the left side of the screen. Your task is to drag and drop these images into the circular arena on the right and arrange them so that more conceptually similar items are placed closer together, and more dissimilar items are placed farther apart.</p>
+    <p>You can move each image as many times as needed to ensure the arrangement reflects conceptual similarity. For example, if you have a wolf and a husky, you might place them close together. If another husky is present, you might place the two huskies closer to each other than to the wolf.</p>
+    <p>You may form several clusters of somewhat similar items after one round of arrangement. Once clustered, you might notice more nuanced differences between them. Please take the time to adjust the distances within and between clusters, as both are significant.</p>
+    <p>When you are satisfied with your arrangement, press the <b>spacebar</b> or <b>tap the screen</b> to proceed.</p>
+  </div>
+
+  <div id="arenaContainer">
+    <div id="arena"></div>
+    <div id="timerDisplay">
+      <p>Total Time: <span id="totalTime">0</span>s</p>
+      <p>Image A: <span id="timeA">0</span>s</p>
+      <p>Image B: <span id="timeB">0</span>s</p>
+      <p>Image C: <span id="timeC">0</span>s</p>
+    </div>
+    <!-- ⚠️ **PLACEHOLDER IMAGES — REPLACE THESE WITH YOUR REAL STIMULI** -->
+    <img src="https://via.placeholder.com/80/ff4444/ffffff?text=A" class="image" style="left: 5%; top: 20%;">
+    <img src="https://via.placeholder.com/80/44ff44/ffffff?text=B" class="image" style="left: 5%; top: 40%;">
+    <img src="https://via.placeholder.com/80/4444ff/ffffff?text=C" class="image" style="left: 5%; top: 60%;">
+    <div id="arenaText">
+      Press SPACE or TAP SCREEN when finished
+    </div>
+  </div>
+
+  <div id="confirmation">
+    <h2>Press F to double-check your arrangement<br>or<br>Press Enter or tap the screen to finish.</h2>
+  </div>
+
+  <div id="questions">
+    <div id="q1" class="question">
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+    </div>
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
+    </div>
+  </div>
+
+  <div id="endScreen">
+    <h2>Thank you for participating!</h2>
+    <p>Your responses have been recorded.</p>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
