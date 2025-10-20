@@ -16,6 +16,9 @@ const totalTimeDisplay = document.getElementById("totalTime");
 const timeADisplay = document.getElementById("timeA");
 const timeBDisplay = document.getElementById("timeB");
 const timeCDisplay = document.getElementById("timeC");
+const csvInstructions = document.getElementById("csvInstructions");
+const csvData = document.getElementById("csvData");
+const downloadLink = document.getElementById("downloadLink");
 
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
@@ -127,13 +130,13 @@ function stopTimer() {
 }
 
 document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) {
+  if (e.code === "Space" && !arenaVisible && !confirmation.classList.contains("visible")) {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     startTime = new Date();
     arenaVisible = true;
     startTimer();
-  } else if (e.code === "Space" && arenaVisible) {
+  } else if (e.code === "Space" && arenaVisible && !confirmation.classList.contains("visible")) {
     arenaVisible = false;
     arenaContainer.style.display = "none";
     confirmation.classList.add("visible");
@@ -151,13 +154,13 @@ document.addEventListener("keydown", e => {
 });
 
 document.addEventListener("touchstart", e => {
-  if (!arenaVisible && e.target.tagName !== "BUTTON") {
+  if (!arenaVisible && e.target.tagName !== "BUTTON" && !confirmation.classList.contains("visible")) {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     startTime = new Date();
     arenaVisible = true;
     startTimer();
-  } else if (arenaVisible && e.target.tagName !== "IMG") {
+  } else if (arenaVisible && e.target.tagName !== "IMG" && !confirmation.classList.contains("visible")) {
     arenaVisible = false;
     arenaContainer.style.display = "none";
     confirmation.classList.add("visible");
@@ -193,11 +196,15 @@ function saveCSV() {
   for (let key in positions) {
     csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
   }
+  // Display CSV data in textarea
+  csvData.value = csv;
+  csvInstructions.style.display = "block";
+  // Provide download option as fallback
   const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `arrangement_${participantID}.csv`;
-  a.click();
+  const url = URL.createObjectURL(blob);
+  downloadLink.href = url;
+  downloadLink.download = `arrangement_${participantID}.csv`;
+  downloadLink.textContent = `Download CSV (arrangement_${participantID}.csv)`;
 }
 
 function showEndMessage() {
