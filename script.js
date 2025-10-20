@@ -16,9 +16,6 @@ const totalTimeDisplay = document.getElementById("totalTime");
 const timeADisplay = document.getElementById("timeA");
 const timeBDisplay = document.getElementById("timeB");
 const timeCDisplay = document.getElementById("timeC");
-const csvInstructions = document.getElementById("csvInstructions");
-const csvData = document.getElementById("csvData");
-const downloadLink = document.getElementById("downloadLink");
 
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
@@ -191,20 +188,34 @@ function recordAnswer(type, answer) {
   }
 }
 
-function saveCSV() {
+async function saveCSV() {
   let csv = "ParticipantID,TotalTime(s),Attention,Device,Image,PosX,PosY,ImageTime(s)\n";
   for (let key in positions) {
     csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
   }
-  // Display CSV data in textarea
-  csvData.value = csv;
-  csvInstructions.style.display = "block";
-  // Provide download option as fallback
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  downloadLink.href = url;
-  downloadLink.download = `arrangement_${participantID}.csv`;
-  downloadLink.textContent = `Download CSV (arrangement_${participantID}.csv)`;
+
+  const backendUrl = 'https://your-backend-url/upload-csv'; // Replace with your actual backend URL
+
+  try {
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csvContent: csv, participantID }),
+    });
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+    console.log('CSV uploaded to GitHub!');
+  } catch (error) {
+    console.error('Error:', error);
+    // Fallback: Download locally
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `arrangement_${participantID}.csv`;
+    a.click();
+  }
 }
 
 function showEndMessage() {
