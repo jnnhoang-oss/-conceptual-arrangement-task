@@ -74,3 +74,23 @@ body {
   color: white;
   font-size: 20px;
 }
+#csvInstructions {
+  margin-top: 20px;
+}
+#csvData {
+  background: #333;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: monospace;
+}
+#downloadLink {
+  color: #1e90ff;
+  text-decoration: none;
+  margin-top: 10px;
+  display: inline-block;
+}
+#downloadLink:hover {
+  text-decoration: underline;
+}
