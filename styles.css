@@ -19,18 +19,18 @@ body {
 }
 #arenaContainer {
   display: none;
-  width: 700vw;
-  height: 700vh;
-  background: solid white;
+  width: 100vw;
+  height: 100vh;
+  background: #222;
   position: relative;
 }
 #arena {
   position: absolute;
-  border: 3px solid white;
+  border: 5px solid white;
   border-radius: 50%;
-  width: 800px;
-  height: 800px;
-  right: 10%;
+  width: 600px;
+  height: 600px;
+  right: 5%;
   top: 50%;
   transform: translateY(-50%);
 }
