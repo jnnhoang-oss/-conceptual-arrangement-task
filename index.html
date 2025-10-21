@@ -1,254 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Conceptual Arrangement Task</title>
-<style>
-  body {
-    margin: 0;
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-  }
-  #instruction, #confirmation, #questions, #endScreen {
-    text-align: center;
-    width: 70%;
-    display: none;
-  }
-  #instruction.visible, #confirmation.visible, #questions.visible, #endScreen.visible {
-    display: block;
-  }
-  #arenaContainer {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    background: #222;
-    position: relative;
-  }
-  #arena {
-    position: absolute;
-    border: 3px solid white;
-    border-radius: 50%;
-    width: 600px;
-    height: 600px;
-    right: 10%;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-  .image {
-    width: 80px;
-    height: 80px;
-    position: absolute;
-    cursor: grab;
-    border-radius: 10px;
-  }
-  .question-btn {
-    background: #444;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    margin: 10px;
-    cursor: pointer;
-  }
-  .question-btn:hover {
-    background: #666;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conceptual Arrangement Task</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="instruction" class="visible">
-    <h1>Conceptual Arrangement Task</h1>
-    <p>In this experiment, you will be using the mouse to click and drag images around the screen.<br>
-    Press the <b>spacebar</b> to start.</p>
-  </div>
-
-  <div id="arenaContainer">
-    <div id="arena"></div>
-    <img src=".github/wth/aardvark.jpg" class="image">
-    <img src=".github/wth/anteater.jpg" class="image">
-    <img src=".github/wth/brown_bear.jpg" class="image">
-    <img src=".github/wth/camel.jpg" class="image">
-    <img src=".github/wth/canary.jpg" class="image">
-    <img src=".github/wth/carp.jpg" class="image">
-    <img src=".github/wth/caterpillarhawkmoth.jpg" class="image">
-    <img src=".github/wth/catfish.jpg" class="image">
-    <img src=".github/wth/chipmunk.jpg" class="image">
-    <img src=".github/wth/cranebug.jpg" class="image">
-    <img src=".github/wth/cricket.jpg" class="image">
-    <img src=".github/wth/elephantafrican.jpg" class="image">
-    <img src=".github/wth/finch.jpg" class="image">
-    <img src=".github/wth/firebug.jpg" class="image">
-    <img src=".github/wth/flea.jpg" class="image">
-    <img src=".github/wth/gerbil.jpg" class="image">
-    <img src=".github/wth/giraffe.jpg" class="image">
-    <img src=".github/wth/goldfish.jpg" class="image">
-    <img src=".github/wth/halibut.jpg" class="image">
-    <img src=".github/wth/herculesbeetle.jpg" class="image">
-    <img src=".github/wth/herring.jpg" class="image">
-    <img src=".github/wth/horse.jpg" class="image">
-    <img src=".github/wth/hyena.jpg" class="image">
-    <img src=".github/wth/leopard.jpg" class="image">
-    <img src=".github/wth/llama.jpg" class="image">
-    <img src=".github/wth/marmot.jpg" class="image">
-    <img src=".github/wth/mouse.jpg" class="image">
-    <img src=".github/wth/ostrich.jpg" class="image">
-    <img src=".github/wth/palmcockatoo.jpg" class="image">
-    <img src=".github/wth/partridge.jpg" class="image">
-    <img src=".github/wth/pelican.jpg" class="image">
-    <img src=".github/wth/perch.jpg" class="image">
-    <img src=".github/wth/pigeon.jpg" class="image">
-    <img src=".github/wth/pike.jpg" class="image">
-    <img src=".github/wth/porcupine.jpg" class="image">
-    <img src=".github/wth/prayingmantis.jpg" class="image">
-     <img src=".github/wth/rabbit.jpg" class="image">
-    <img src=".github/wth/reindeer.jpg" class="image">
-    <img src=".github/wth/salmon.jpg" class="image">
-    <img src=".github/wth/shark.jpg" class="image">
-    <img src=".github/wth/sheep.jpg" class="image">
-    <img src=".github/wth/shrimp.jpg" class="image">
-    <img src=".github/wth/skunk.jpg" class="image">
-    <img src=".github/wth/snail.jpg" class="image">
-    <img src=".github/wth/starfish.jpg" class="image">
-    <img src=".github/wth/tiger.jpg" class="image">
-    <img src=".github/wth/turkey.jpg" class="image">
-    <img src=".github/wth/waterbuffalo.jpg" class="image">
-    <div id="arenaText" style="position:absolute; bottom:20px; width:100%; text-align:center; color:white; font-size:20px;">
-      Click SPACE when finished
+  <div id="instruction-screen" class="fullscreen">
+    <div class="instruction-text">
+      <h2>Instructions</h2>
+      <p>
+        In this experiment, you will be using the mouse to click and drag placeholders (representing images) around the screen. 
+        At the beginning, you will press the <b>spacebar</b> to start, and a set of colored boxes will appear on the left side of the screen. 
+        It will be your job to drag and drop those boxes into the circular arena on the right, and arrange them so that the more conceptually 
+        similar items are placed closer together, and the more dissimilar items are placed farther apart.
+      </p>
+      <p>
+        You can move each placeholder as many times as you’d like to make sure that the arrangement corresponds to the conceptual similarity.
+      </p>
+      <p class="bold">Press SPACE to begin.</p>
     </div>
   </div>
 
-  <div id="confirmation">
-    <h2>Click F to double-check your arrangement<br>or<br>Press Enter to finish.</h2>
+  <div id="task-screen" class="hidden">
+    <canvas id="arenaCanvas"></canvas>
   </div>
 
-  <div id="questions">
-    <div id="q1" class="question">
-      <h2>Did you pay attention (BE HONEST)?</h2>
-      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
-      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
-    </div>
-    <div id="q2" class="question" style="display:none;">
-      <h2>Are you using the same device as the first time?</h2>
-      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
-      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
-    </div>
-  </div>
-
-  <div id="endScreen">
-    <h2>Thank you for participating!</h2>
-    <p>Your responses have been recorded.</p>
-  </div>
-
-<script>
-let participantID = prompt("Enter your Participant ID:");
-let startTime, endTime, arenaVisible = false;
-let attentionAnswer = "", deviceAnswer = "";
-
-const instruction = document.getElementById("instruction");
-const arenaContainer = document.getElementById("arenaContainer");
-const confirmation = document.getElementById("confirmation");
-const questions = document.getElementById("questions");
-const endScreen = document.getElementById("endScreen");
-const images = document.querySelectorAll(".image");
-
-let positions = {};
-
-images.forEach(img => {
-  img.addEventListener("mousedown", startDrag);
-});
-
-let activeImage = null;
-function startDrag(e) {
-  activeImage = e.target;
-  document.addEventListener("mousemove", drag);
-  document.addEventListener("mouseup", stopDrag);
-}
-function drag(e) {
-  if (!activeImage) return;
-  activeImage.style.left = e.pageX - 40 + "px";
-  activeImage.style.top = e.pageY - 40 + "px";
-}
-function stopDrag() {
-  if (activeImage) {
-    const rect = activeImage.getBoundingClientRect();
-    positions[activeImage.src] = {
-      x: rect.left,
-      y: rect.top
-    };
-  }
-  document.removeEventListener("mousemove", drag);
-  document.removeEventListener("mouseup", stopDrag);
-  activeImage = null;
-}
-
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) {
-    instruction.classList.remove("visible");
-    arenaContainer.style.display = "block";
-    startTime = new Date();
-    arenaVisible = true;
-  } else if (e.code === "Space" && arenaVisible) {
-    arenaVisible = false;
-    arenaContainer.style.display = "none";
-    confirmation.classList.add("visible");
-  } else if (e.code === "KeyF" && confirmation.classList.contains("visible")) {
-    confirmation.classList.remove("visible");
-    arenaContainer.style.display = "block";
-    arenaVisible = true;
-  } else if (e.code === "Enter" && confirmation.classList.contains("visible")) {
-    confirmation.classList.remove("visible");
-    showQuestions();
-  }
-});
-
-function showQuestions() {
-  endTime = new Date();
-  totalSeconds = Math.floor((endTime - startTime) / 1000);
-  questions.classList.add("visible");
-}
-
-function recordAnswer(type, answer) {
-  if (type === "attention") {
-    attentionAnswer = answer;
-    document.getElementById("q1").style.display = "none";
-    document.getElementById("q2").style.display = "block";
-  } else if (type === "device") {
-    deviceAnswer = answer;
-    questions.classList.remove("visible");
-    sendDataToServer();
-    showEndMessage();
-  }
-}
-
-function sendDataToServer() {
-  let csv = "ParticipantID,Time(s),Attention,Device,Image,PosX,PosY\n";
-  for (let key in positions) {
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${positions[key].x},${positions[key].y}\n`;
-  }
-
-  fetch("/save-data", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      filename: `arrangement_${participantID}.csv`,
-      content: csv
-    })
-  })
-  .then(res => res.text())
-  .then(response => console.log(response))
-  .catch(err => console.error("Error saving data:", err));
-}
-
-function showEndMessage() {
-  endScreen.classList.add("visible");
-}
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
