@@ -12,7 +12,6 @@ const endScreen = document.getElementById("endScreen");
 const images = document.querySelectorAll(".image");
 const arena = document.getElementById("arena");
 const totalTimeDisplay = document.getElementById("totalTime");
-const timerDisplay = document.getElementById("timerDisplay");
 
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
@@ -22,15 +21,6 @@ images.forEach(img => {
     console.error(`Failed to load image: ${img.src}`);
   };
 });
-
-function initializeTimerDisplay() {
-  images.forEach(img => {
-    const filename = img.src.split('/').pop().replace('.jpg', '');
-    const p = document.createElement("p");
-    p.innerHTML = `${filename}: <span id="time_${filename}">0</span>s`;
-    timerDisplay.appendChild(p);
-  });
-}
 
 function randomizeImagePositions() {
   const minTop = 10; // 10% from top
@@ -144,11 +134,8 @@ function stopDragTouch() {
 }
 
 function updateImageTimerDisplay(src, time) {
-  const filename = src.split('/').pop().replace('.jpg', '');
-  const timeDisplay = document.getElementById(`time_${filename}`);
-  if (timeDisplay) {
-    timeDisplay.textContent = time;
-  }
+  // Only update imageTimes for CSV, no DOM manipulation
+  imageTimes[src] = time;
 }
 
 function startTimer() {
@@ -166,7 +153,6 @@ document.addEventListener("keydown", e => {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     randomizeImagePositions();
-    initializeTimerDisplay();
     startTime = new Date();
     arenaVisible = true;
     startTimer();
@@ -187,7 +173,6 @@ document.addEventListener("touchstart", e => {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     randomizeImagePositions();
-    initializeTimerDisplay();
     startTime = new Date();
     arenaVisible = true;
     startTimer();
@@ -203,6 +188,10 @@ document.addEventListener("touchstart", e => {
   }
 });
 
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
 function showQuestions() {
   endTime = new Date();
   totalSeconds = Math.floor((endTime - startTime) / 1000);
@@ -215,44 +204,4 @@ function recordAnswer(type, answer) {
     document.getElementById("q1").style.display = "none";
     document.getElementById("q2").style.display = "block";
   } else if (type === "device") {
-    deviceAnswer = answer;
-    questions.classList.remove("visible");
-    saveCSV();
-    showEndMessage();
-  }
-}
-
-async function saveCSV() {
-  let csv = "ParticipantID,TotalTime(s),Attention,Device,Image,PosX,PosY,ImageTime(s)\n";
-  for (let key in positions) {
-    const filename = key.split('/').pop();
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${filename},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
-  }
-
-  const backendUrl = 'https://your-backend-url/upload-csv'; // Replace with your actual backend URL
-
-  try {
-    const response = await fetch(backendUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csvContent: csv, participantID }),
-    });
-    if (!response.ok) {
-      throw new Error('Upload failed');
-    }
-    console.log('CSV uploaded to GitHub!');
-  } catch (error) {
-    console.error('Error:', error);
-    // Fallback: Download locally
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `arrangement_${participantID}.csv`;
-    a.click();
-  }
-}
-
-function showEndMessage() {
-  endScreen.classList.add("visible");
-}
+    deviceAnswer = answer
