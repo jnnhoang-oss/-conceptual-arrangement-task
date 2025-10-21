@@ -30,8 +30,8 @@ body {
   border-radius: 50%;
   width: 80vw;
   height: 80vw; /* Keep circular, match width */
-  max-width: 900px; /* Prevent excessive size on large screens */
-  max-height: 900px;
+  max-width: 800px; /* Prevent excessive size on large screens */
+  max-height: 800px;
   right: 2%;
   top: 50%;
   transform: translateY(-50%);
