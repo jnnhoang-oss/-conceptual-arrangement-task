@@ -9,12 +9,12 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-#instruction, #confirmation, #questions, #endScreen {
+#instruction, #questions, #endScreen {
   text-align: center;
   width: 70%;
   display: none;
 }
-#instruction.visible, #confirmation.visible, #questions.visible, #endScreen.visible {
+#instruction.visible, #questions.visible, #endScreen.visible {
   display: block;
 }
 #arenaContainer {
@@ -28,8 +28,8 @@ body {
   position: absolute;
   border: 5px solid white;
   border-radius: 50%;
-  width: 700px;
-  height: 700px;
+  width: 600px;
+  height: 600px;
   right: 5%;
   top: 50%;
   transform: translateY(-50%);
