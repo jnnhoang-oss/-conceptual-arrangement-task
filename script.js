@@ -29,8 +29,8 @@ function initializeTimerDisplay() {
 }
 
 function randomizeImagePositions() {
-  const minTop = 10; // 10% from top
-  const maxTop = 90; // 90% from top
+  const minTop = 30; // 30% from top
+  const maxTop = 70; // 80% from top
   const range = maxTop - minTop;
   const totalImages = images.length;
   const spacing = range / totalImages; // Distribute images to avoid overlap
