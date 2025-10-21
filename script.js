@@ -7,7 +7,6 @@ let timerInterval;
 
 const instruction = document.getElementById("instruction");
 const arenaContainer = document.getElementById("arenaContainer");
-const confirmation = document.getElementById("confirmation");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
 const images = document.querySelectorAll(".image");
@@ -49,6 +48,15 @@ function isWithinArena(x, y) {
     Math.pow(x - arenaCenterX, 2) + Math.pow(y - arenaCenterY, 2)
   );
   return distance <= radius;
+}
+
+function areAllImagesInArena() {
+  return Array.from(images).every(img => {
+    const rect = img.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    return isWithinArena(centerX, centerY);
+  });
 }
 
 function drag(e) {
@@ -103,11 +111,11 @@ function stopDragTouch() {
 }
 
 function updateImageTimerDisplay(src, time) {
-  if (src.includes("text=A")) {
+  if (src.includes("imageA")) {
     timeADisplay.textContent = time;
-  } else if (src.includes("text=B")) {
+  } else if (src.includes("imageB")) {
     timeBDisplay.textContent = time;
-  } else if (src.includes("text=C")) {
+  } else if (src.includes("imageC")) {
     timeCDisplay.textContent = time;
   }
 }
@@ -127,45 +135,40 @@ function stopTimer() {
 }
 
 document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible && !confirmation.classList.contains("visible")) {
+  if (e.code === "Space" && !arenaVisible) {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     startTime = new Date();
     arenaVisible = true;
     startTimer();
-  } else if (e.code === "Space" && arenaVisible && !confirmation.classList.contains("visible")) {
-    arenaVisible = false;
-    arenaContainer.style.display = "none";
-    confirmation.classList.add("visible");
-    stopTimer();
-  } else if (e.code === "KeyF" && confirmation.classList.contains("visible")) {
-    confirmation.classList.remove("visible");
-    arenaContainer.style.display = "block";
-    arenaVisible = true;
-    startTimer();
-  } else if (e.code === "Enter" && confirmation.classList.contains("visible")) {
-    confirmation.classList.remove("visible");
-    stopTimer();
-    showQuestions();
+  } else if (e.code === "Enter" && arenaVisible) {
+    if (areAllImagesInArena()) {
+      arenaVisible = false;
+      arenaContainer.style.display = "none";
+      stopTimer();
+      showQuestions();
+    } else {
+      alert("Please place all images inside the arena before proceeding.");
+    }
   }
 });
 
 document.addEventListener("touchstart", e => {
-  if (!arenaVisible && e.target.tagName !== "BUTTON" && !confirmation.classList.contains("visible")) {
+  if (!arenaVisible && e.target.tagName !== "BUTTON") {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
     startTime = new Date();
     arenaVisible = true;
     startTimer();
-  } else if (arenaVisible && e.target.tagName !== "IMG" && !confirmation.classList.contains("visible")) {
-    arenaVisible = false;
-    arenaContainer.style.display = "none";
-    confirmation.classList.add("visible");
-    stopTimer();
-  } else if (confirmation.classList.contains("visible") && e.target.tagName !== "BUTTON") {
-    confirmation.classList.remove("visible");
-    stopTimer();
-    showQuestions();
+  } else if (arenaVisible && e.target.tagName !== "IMG") {
+    if (areAllImagesInArena()) {
+      arenaVisible = false;
+      arenaContainer.style.display = "none";
+      stopTimer();
+      showQuestions();
+    } else {
+      alert("Please place all images inside the arena before proceeding.");
+    }
   }
 });
 
