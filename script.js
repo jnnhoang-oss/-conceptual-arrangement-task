@@ -12,14 +12,43 @@ const endScreen = document.getElementById("endScreen");
 const images = document.querySelectorAll(".image");
 const arena = document.getElementById("arena");
 const totalTimeDisplay = document.getElementById("totalTime");
-const timeADisplay = document.getElementById("timeA");
-const timeBDisplay = document.getElementById("timeB");
-const timeCDisplay = document.getElementById("timeC");
+const timerDisplay = document.getElementById("timerDisplay");
 
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
   img.addEventListener("touchstart", startDragTouch, { passive: false });
 });
+
+function initializeTimerDisplay() {
+  images.forEach(img => {
+    const filename = img.src.split('/').pop().replace('.jpg', '');
+    const p = document.createElement("p");
+    p.innerHTML = `${filename}: <span id="time_${filename}">0</span>s`;
+    timerDisplay.appendChild(p);
+  });
+}
+
+function randomizeImagePositions() {
+  const minTop = 10; // 10% from top
+  const maxTop = 90; // 90% from top
+  const range = maxTop - minTop;
+  const totalImages = images.length;
+  const spacing = range / totalImages; // Distribute images to avoid overlap
+
+  // Shuffle indices to randomize order
+  const indices = Array.from({ length: totalImages }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  images.forEach((img, index) => {
+    const positionIndex = indices[index];
+    const topPercent = minTop + positionIndex * spacing;
+    img.style.left = '5%';
+    img.style.top = `${topPercent}%`;
+  });
+}
 
 let activeImage = null;
 
@@ -43,7 +72,7 @@ function isWithinArena(x, y) {
   const arenaRect = arena.getBoundingClientRect();
   const arenaCenterX = arenaRect.left + arenaRect.width / 2;
   const arenaCenterY = arenaRect.top + arenaRect.height / 2;
-  const radius = arenaRect.width / 2 - 40; // Adjust for image size (80px / 2)
+  const radius = arenaRect.width / 2 - 25; // Adjust for image size (50px / 2)
   const distance = Math.sqrt(
     Math.pow(x - arenaCenterX, 2) + Math.pow(y - arenaCenterY, 2)
   );
@@ -61,9 +90,9 @@ function areAllImagesInArena() {
 
 function drag(e) {
   if (!activeImage) return;
-  let newX = e.pageX - 40; // Center of 80px image
-  let newY = e.pageY - 40;
-  if (isWithinArena(newX + 40, newY + 40)) {
+  let newX = e.pageX - 25; // Center of 50px image
+  let newY = e.pageY - 25;
+  if (isWithinArena(newX + 25, newY + 25)) {
     activeImage.style.left = newX + "px";
     activeImage.style.top = newY + "px";
   }
@@ -73,9 +102,9 @@ function dragTouch(e) {
   e.preventDefault();
   if (!activeImage || e.touches.length !== 1) return;
   const touch = e.touches[0];
-  let newX = touch.pageX - 40;
-  let newY = touch.pageY - 40;
-  if (isWithinArena(newX + 40, newY + 40)) {
+  let newX = touch.pageX - 25;
+  let newY = touch.pageY - 25;
+  if (isWithinArena(newX + 25, newY + 25)) {
     activeImage.style.left = newX + "px";
     activeImage.style.top = newY + "px";
   }
@@ -111,12 +140,10 @@ function stopDragTouch() {
 }
 
 function updateImageTimerDisplay(src, time) {
-  if (src.includes("imageA")) {
-    timeADisplay.textContent = time;
-  } else if (src.includes("imageB")) {
-    timeBDisplay.textContent = time;
-  } else if (src.includes("imageC")) {
-    timeCDisplay.textContent = time;
+  const filename = src.split('/').pop().replace('.jpg', '');
+  const timeDisplay = document.getElementById(`time_${filename}`);
+  if (timeDisplay) {
+    timeDisplay.textContent = time;
   }
 }
 
@@ -130,14 +157,12 @@ function startTimer() {
   }, 1000);
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
 document.addEventListener("keydown", e => {
   if (e.code === "Space" && !arenaVisible) {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
+    randomizeImagePositions();
+    initializeTimerDisplay();
     startTime = new Date();
     arenaVisible = true;
     startTimer();
@@ -157,6 +182,8 @@ document.addEventListener("touchstart", e => {
   if (!arenaVisible && e.target.tagName !== "BUTTON") {
     instruction.classList.remove("visible");
     arenaContainer.style.display = "block";
+    randomizeImagePositions();
+    initializeTimerDisplay();
     startTime = new Date();
     arenaVisible = true;
     startTimer();
@@ -194,7 +221,8 @@ function recordAnswer(type, answer) {
 async function saveCSV() {
   let csv = "ParticipantID,TotalTime(s),Attention,Device,Image,PosX,PosY,ImageTime(s)\n";
   for (let key in positions) {
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
+    const filename = key.split('/').pop();
+    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${filename},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
   }
 
   const backendUrl = 'https://your-backend-url/upload-csv'; // Replace with your actual backend URL
