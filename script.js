@@ -17,6 +17,10 @@ const timerDisplay = document.getElementById("timerDisplay");
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
   img.addEventListener("touchstart", startDragTouch, { passive: false });
+  // Log image loading errors
+  img.onerror = () => {
+    console.error(`Failed to load image: ${img.src}`);
+  };
 });
 
 function initializeTimerDisplay() {
@@ -29,8 +33,8 @@ function initializeTimerDisplay() {
 }
 
 function randomizeImagePositions() {
-  const minTop = 30; // 30% from top
-  const maxTop = 70; // 80% from top
+  const minTop = 10; // 10% from top
+  const maxTop = 90; // 90% from top
   const range = maxTop - minTop;
   const totalImages = images.length;
   const spacing = range / totalImages; // Distribute images to avoid overlap
