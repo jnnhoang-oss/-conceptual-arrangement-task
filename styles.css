@@ -62,6 +62,8 @@ body {
   background: rgba(0, 0, 0, 0.5);
   padding: 10px;
   border-radius: 5px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 #timerDisplay p {
   margin: 5px 0;
