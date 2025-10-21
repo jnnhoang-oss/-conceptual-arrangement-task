@@ -29,16 +29,16 @@ body {
   border: 5px solid white;
   border-radius: 50%;
   width: 80vw;
-  height: 80vw; /* Keep circular, match width */
-  max-width: 800px; /* Prevent excessive size on large screens */
-  max-height: 800px;
+  height: 80vw;
+  max-width: 900px;
+  max-height: 900px;
   right: 2%;
   top: 50%;
   transform: translateY(-50%);
 }
 .image {
-  width: 80px;
-  height: 80px;
+  width: 50px;
+  height: 50px;
   position: absolute;
   cursor: grab;
   border-radius: 10px;
