@@ -30,8 +30,8 @@ body {
   border-radius: 50%;
   width: 80vw;
   height: 80vw;
-  max-width: 800px;
-  max-height: 800px;
+  max-width: 900px;
+  max-height: 900px;
   right: 2%;
   top: 50%;
   transform: translateY(-50%);
@@ -64,8 +64,6 @@ body {
   background: rgba(0, 0, 0, 0.5);
   padding: 10px;
   border-radius: 5px;
-  max-height: 80vh;
-  overflow-y: auto;
 }
 #timerDisplay p {
   margin: 5px 0;
