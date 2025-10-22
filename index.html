@@ -1,32 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conceptual Arrangement Task</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Conceptual Arrangement Task</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    overflow: hidden;
+  }
+  #instruction, #arenaContainer, #questions, #endScreen {
+    display: none;
+    text-align: center;
+    padding: 30px;
+  }
+  #instruction.visible {
+    display: block;
+  }
+  #arenaContainer.visible {
+    display: block;
+  }
+  #arena {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    border: 4px dashed #444;
+    background: rgba(200, 200, 255, 0.2);
+  }
+  #arenaText {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: #222;
+  }
+  .image {
+    position: absolute;
+    width: 80px;
+    cursor: grab;
+    transition: transform 0.1s;
+  }
+  #timerDisplay {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  }
+  .question {
+    margin-top: 20%;
+  }
+  .question-btn {
+    font-size: 20px;
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  #endScreen {
+    text-align: center;
+    margin-top: 20%;
+  }
+</style>
 </head>
 <body>
-  <div id="instruction-screen" class="fullscreen">
-    <div class="instruction-text">
-      <h2>Instructions</h2>
-      <p>
-        In this experiment, you will be using the mouse to click and drag placeholders (representing images) around the screen. 
-        At the beginning, you will press the <b>spacebar</b> to start, and a set of colored boxes will appear on the left side of the screen. 
-        It will be your job to drag and drop those boxes into the circular arena on the right, and arrange them so that the more conceptually 
-        similar items are placed closer together, and the more dissimilar items are placed farther apart.
-      </p>
-      <p>
-        You can move each placeholder as many times as you’d like to make sure that the arrangement corresponds to the conceptual similarity.
-      </p>
-      <p class="bold">Press SPACE to begin.</p>
+  <div id="instruction" class="visible">
+    <h1>Conceptual Arrangement Task</h1>
+    <p>Thank you for participating!</p>
+    <p>In this experiment, you will use the mouse to drag images around the screen. Press <b>Space</b> to start. A set of images will appear on the left. Drag and drop them into the circular arena on the right so that similar items are close together.</p>
+    <p>When satisfied, click <b>SPACE</b> to finish, then follow the on-screen instructions.</p>
+  </div>
+
+  <div id="arenaContainer">
+    <div id="arena"></div>
+    <div id="timerDisplay">⏱️ <span id="totalTime">0</span>s</div>
+    <div id="arenaText">Click SPACE when finished</div>
+    <!-- PLACEHOLDER IMAGES -->
+    <img src="https://placehold.co/80x80?text=1" class="image">
+    <img src="https://placehold.co/80x80?text=2" class="image">
+    <img src="https://placehold.co/80x80?text=3" class="image">
+    <img src="https://placehold.co/80x80?text=4" class="image">
+    <img src="https://placehold.co/80x80?text=5" class="image">
+  </div>
+
+  <div id="questions">
+    <div id="q1" class="question">
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+    </div>
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
     </div>
   </div>
 
-  <div id="task-screen" class="hidden">
-    <canvas id="arenaCanvas"></canvas>
+  <div id="endScreen">
+    <h2>Thank you for participating!</h2>
+    <p>Your responses have been saved.</p>
   </div>
 
-  <script src="script.js"></script>
+<script>
+let startTime, timerInterval, totalTime = 0;
+let stage = "instructions";
+let arenaVisible = false;
+let confirmScreen = false;
+let answers = { attention: "", device: "" };
+
+const instruction = document.getElementById("instruction");
+const arenaContainer = document.getElementById("arenaContainer");
+const totalTimeEl = document.getElementById("totalTime");
+const questions = document.getElementById("questions");
+const q1 = document.getElementById("q1");
+const q2 = document.getElementById("q2");
+const endScreen = document.getElementById("endScreen");
+
+// DRAGGABLE IMAGES
+const imgs = document.querySelectorAll(".image");
+let activeImg = null, offsetX = 0, offsetY = 0;
+
+imgs.forEach(img => {
+  img.style.left = `${50 + Math.random() * 300}px`;
+  img.style.top = `${100 + Math.random() * 500}px`;
+
+  img.addEventListener("mousedown", e => {
+    activeImg = img;
+    offsetX = e.clientX - img.offsetLeft;
+    offsetY = e.clientY - img.offsetTop;
+    img.style.cursor = "grabbing";
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (activeImg) activeImg.style.cursor = "grab";
+    activeImg = null;
+  });
+
+  document.addEventListener("mousemove", e => {
+    if (activeImg) {
+      activeImg.style.left = `${e.clientX - offsetX}px`;
+      activeImg.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+});
+
+// TIMER
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    totalTime = Math.floor((Date.now() - startTime) / 1000);
+    totalTimeEl.textContent = totalTime;
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+
+// KEY EVENTS
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && stage === "instructions") {
+    instruction.style.display = "none";
+    arenaContainer.classList.add("visible");
+    startTimer();
+    stage = "arranging";
+  } else if (e.code === "Space" && stage === "arranging") {
+    stopTimer();
+    arenaContainer.style.display = "none";
+    confirmScreen = true;
+    showConfirmScreen();
+  } else if (confirmScreen && e.code === "KeyF") {
+    confirmScreen = false;
+    arenaContainer.classList.add("visible");
+    startTimer();
+    stage = "arranging";
+  } else if (confirmScreen && e.code === "Enter") {
+    confirmScreen = false;
+    showQuestions();
+  }
+});
+
+function showConfirmScreen() {
+  const div = document.createElement("div");
+  div.id = "confirmScreen";
+  div.style.position = "absolute";
+  div.style.top = "40%";
+  div.style.width = "100%";
+  div.style.textAlign = "center";
+  div.innerHTML = `
+    <h2>Click F to double-check your arrangement</h2>
+    <h2>or Press Enter to finish</h2>
+  `;
+  document.body.appendChild(div);
+}
+
+function showQuestions() {
+  document.getElementById("confirmScreen").remove();
+  questions.style.display = "block";
+  stage = "questions";
+}
+
+function recordAnswer(type, val) {
+  answers[type] = val;
+  if (type === "attention") {
+    q1.style.display = "none";
+    q2.style.display = "block";
+  } else {
+    saveCSV();
+  }
+}
+
+function saveCSV() {
+  // collect coordinates
+  let csv = "Image,X,Y,Time,Attention,Device\n";
+  imgs.forEach((img, i) => {
+    const x = Math.round(img.offsetLeft);
+    const y = Math.round(img.offsetTop);
+    csv += `${i+1},${x},${y},${totalTime},${answers.attention},${answers.device}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `arrangement_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  questions.style.display = "none";
+  endScreen.style.display = "block";
+}
+</script>
 </body>
 </html>
