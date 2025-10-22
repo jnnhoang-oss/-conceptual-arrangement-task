@@ -1,3 +1,4 @@
+/* ==== Base Styling ==== */
 html, body {
   margin: 0;
   padding: 0;
@@ -15,6 +16,7 @@ html, body {
   height: 100vh;
   text-align: center;
   padding: 2rem;
+  flex-direction: column;
 }
 
 .bold {
@@ -26,6 +28,115 @@ html, body {
   display: none;
 }
 
+/* ==== Arena Styling ==== */
+#arenaContainer {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #111;
+  overflow: hidden;
+}
+
+#arena {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background-color: #333;
+  border: 4px dashed #ffcc00;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+}
+
+/* ==== Image Placeholders ==== */
+.image {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background-color: #444;
+  border-radius: 10px;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.image:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+.placeholder {
+  border: 2px solid #999;
+  background-color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+}
+
+/* ==== Question Screens ==== */
+#questions {
+  display: none;
+  text-align: center;
+}
+
+#questions.visible {
+  display: block;
+}
+
+.question {
+  margin: 2rem;
+  font-size: 1.2rem;
+}
+
+button {
+  background-color: #ffcc00;
+  border: none;
+  color: #222;
+  font-weight: bold;
+  padding: 0.7rem 1.5rem;
+  margin: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #ffe066;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* ==== End Screen ==== */
+#endScreen {
+  display: none;
+  text-align: center;
+}
+
+#endScreen.visible {
+  display: block;
+}
+
+/* ==== Timer Display ==== */
+#totalTime {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+/* ==== Canvas (if used elsewhere) ==== */
 canvas {
   display: block;
   width: 100vw;
