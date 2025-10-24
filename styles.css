@@ -43,8 +43,8 @@ html, body {
   right: 10%;
   top: 50%;
   transform: translateY(-50%);
-  width: 700px;
-  height: 700px;
+  width: 740px;
+  height: 750px;
   border-radius: 50%;
   border: 4px dashed #ffcc00;
   background-color: rgba(255, 255, 255, 0.05);
@@ -113,7 +113,7 @@ button:active {
   transform: scale(0.95);
 }
 
-/* ==== End Screen ==== */
+/end WILL PUT A THANK U NOTE !!!!/
 #endScreen {
   display: none;
   text-align: center;
@@ -123,7 +123,7 @@ button:active {
   display: block;
 }
 
-/* ==== Timer Display ==== */
+/ Timer eehh... /
 #totalTime {
   position: absolute;
   top: 15px;
@@ -136,7 +136,7 @@ button:active {
   font-weight: bold;
 }
 
-/* ==== Canvas (if used elsewhere) ==== */
+/ tbh idk but yeah its here /
 canvas {
   display: block;
   width: 100vw;
