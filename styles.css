@@ -1,4 +1,4 @@
-/* ==== Base Styling ==== */
+/Screen; base wtv/
 html, body {
   margin: 0;
   padding: 0;
@@ -28,7 +28,7 @@ html, body {
   display: none;
 }
 
-/* ==== Arena bro idek ==== */
+/~~~~ Arena bro idek ~~~/
 #arenaContainer {
   display: none;
   position: relative;
@@ -51,7 +51,7 @@ html, body {
 }
 
 
-/* ==== Image Placeholders ==== */
+/~~ images ~~/
 .image {
   position: absolute;
   width: 80px;
