@@ -16,7 +16,7 @@ try {
   const questions = document.getElementById("questions");
   const endScreen = document.getElementById("endScreen");
 
-  // ✅ Correct GitHub image base path
+  // jpg or wtv
   const basePath = "./.github/wth/";
 
   const imageNames = [
@@ -39,8 +39,8 @@ try {
     img.className = "image";
     img.draggable = false;
     img.style.position = "absolute";
-    img.style.width = "60px";
-    img.style.height = "60px";
+    img.style.width = "20px";
+    img.style.height = "20px";
     img.style.cursor = "grab";
     img.addEventListener("mousedown", startDrag);
     img.addEventListener("touchstart", startDragTouch, { passive: false });
