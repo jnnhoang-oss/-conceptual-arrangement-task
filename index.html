@@ -1,35 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conceptual Arrangement Task</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Conceptual Arrangement Task</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%; overflow: hidden;
+    background-color: #222;
+    color: white; font-family: Arial, sans-serif;
+  }
+  .visible { display: block; }
+  .hidden { display: none; }
+  #instruction, #questions, #endScreen {
+    text-align: center; padding: 2rem; display: none;
+  }
+  #instruction.visible, #questions.visible, #endScreen.visible {
+    display: block;
+  }
+  #arenaContainer {
+    position: relative; width: 100vw; height: 100vh;
+    display: none; background: #333;
+  }
+  #arena {
+    position: absolute; top: 50%; right: 15%;
+    transform: translateY(-50%);
+    width: 500px; height: 500px;
+    border: 3px dashed #ffcc00; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  #timerDisplay {
+    position: absolute; top: 10px; left: 10px;
+  }
+  #arenaText {
+    position: absolute; bottom: 15px; width: 100%;
+    text-align: center; font-style: italic;
+  }
+  .image {
+    position: absolute;
+    width: 80px; height: 80px;
+    border-radius: 10px;
+    cursor: grab;
+    transition: transform 0.05s linear;
+  }
+  .image:active { cursor: grabbing; transform: scale(1.05); }
+  .question-btn {
+    margin: 10px; padding: 10px 20px;
+    background-color: #ffcc00; border: none; border-radius: 6px;
+    cursor: pointer; font-weight: bold;
+  }
+</style>
 </head>
 <body>
-  <!-- INSTRUCTION SCREEN -->
+  <!-- INSTRUCTION -->
   <div id="instruction" class="visible">
     <h1>Conceptual Arrangement Task</h1>
-    <p>Thank you for participating!</p>
-    <p>
-      You will drag animal images into a circular arena and arrange them so that
-      similar animals are closer together. Press <b>SPACEBAR</b> (or tap) to begin.
-    </p>
-    <p>When all images are in the arena, press <b>ENTER</b> (or tap) to finish.</p>
+    <p>Press <b>SPACE</b> to start.</p>
   </div>
 
-  <!-- ARENA SCREEN -->
+  <!-- ARENA -->
   <div id="arenaContainer">
     <div id="arena"></div>
     <div id="timerDisplay">
       <p>Total Time: <span id="totalTime">0</span>s</p>
     </div>
-    <div id="arenaText">
-      Place all images in the arena, then press ENTER or TAP to finish
-    </div>
+    <div id="arenaText">Click and drag images. Press ENTER when finished.</div>
   </div>
 
-  <!-- QUESTIONS SCREEN -->
+  <!-- QUESTIONS -->
   <div id="questions">
     <div id="q1" class="question">
       <h2>Did you pay attention (BE HONEST)?</h2>
@@ -37,7 +76,7 @@
       <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
     </div>
     <div id="q2" class="question" style="display:none;">
-      <h2>Are you using the same device as the first time?</h2>
+      <h2>Are you using the same device as before?</h2>
       <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
       <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
     </div>
@@ -46,39 +85,126 @@
   <!-- END SCREEN -->
   <div id="endScreen">
     <h2>Thank you for participating!</h2>
-    <p>Your responses have been recorded.</p>
-    <p class="thank-you-note">Your participation helps advance our understanding of conceptual similarity. Thank you!</p>
+    <p>Your data has been saved.</p>
   </div>
 
-  <!-- JAVASCRIPT -->
-  <script>
-    // Dynamically load images from .github/wth/
-    const imageFolder = ".github/wth/";
-    const imageNames = [
-      "aardvark.jpg", "anteater.jpg", "brown_bear.jpg", "camel.jpg", "canary.jpg",
-      "carp.jpg", "caterpillarhawkmoth.jpg", "catfish.jpg", "chipmunk.jpg", "cranebug.jpg",
-      "cricket.jpg", "elephantafrican.jpg", "finch.jpg", "firebug.jpg", "flea.jpg",
-      "gerbil.jpg", "giraffe.jpg", "goldfish.jpg", "halibut.jpg", "herculesbeetle.jpg",
-      "herring.jpg", "horse.jpg", "hyena.jpg", "leopard.jpg", "llama.jpg", "marmot.jpg",
-      "mouse.jpg", "ostrich.jpg", "palmcockatoo.jpg", "partridge.jpg", "pelican.jpg",
-      "perch.jpg", "pigeon.jpg", "pike.jpg", "porcupine.jpg", "prayingmantis.jpg",
-      "rabbit.jpg", "reindeer.jpg", "salmon.jpg", "shark.jpg", "sheep.jpg", "shrimp.jpg",
-      "skunk.jpg", "snail.jpg", "starfish.jpg", "tiger.jpg", "turkey.jpg", "waterbuffalo.jpg"
-    ];
+<script>
+  // =============== GLOBALS ==================
+  const arenaContainer = document.getElementById("arenaContainer");
+  const arena = document.getElementById("arena");
+  const instruction = document.getElementById("instruction");
+  const questions = document.getElementById("questions");
+  const endScreen = document.getElementById("endScreen");
+  const totalTimeDisplay = document.getElementById("totalTime");
 
-    const arenaContainer = document.getElementById("arenaContainer");
+  let participantID = prompt("Enter Participant ID:");
+  let startTime, timerInterval;
+  let attentionAnswer = "", deviceAnswer = "";
+  let positions = {};
+  let totalSeconds = 0;
+  let arenaVisible = false;
 
-    // Add images dynamically
-    imageNames.forEach(name => {
+  // =============== IMAGE SETUP ==================
+  const imageFolder = "images/"; // move your .jpg files here (not in .github!)
+  const imageNames = [
+    "aardvark.jpg","anteater.jpg","camel.jpg","tiger.jpg","rabbit.jpg","horse.jpg"
+  ];
+
+  function loadImages() {
+    imageNames.forEach((name, i) => {
       const img = document.createElement("img");
-      img.src = `${imageFolder}${name}`;
-      img.alt = name.replace(".jpg", "");
+      img.src = imageFolder + name;
       img.className = "image";
-      img.draggable = false;
+      img.style.left = "5%";
+      img.style.top = `${10 + i * 12}%`;
       arenaContainer.appendChild(img);
     });
-  </script>
+  }
 
-  <script src="script.js"></script>
+  // =============== DRAGGING ==================
+  let active = null;
+  let offsetX = 0, offsetY = 0;
+
+  function enableDragging() {
+    const imgs = document.querySelectorAll(".image");
+    imgs.forEach(img => {
+      img.addEventListener("mousedown", e => {
+        active = e.target;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+      });
+    });
+
+    document.addEventListener("mousemove", e => {
+      if (!active) return;
+      const x = e.pageX - offsetX;
+      const y = e.pageY - offsetY;
+      active.style.left = x + "px";
+      active.style.top = y + "px";
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (active) {
+        const rect = active.getBoundingClientRect();
+        const key = active.src.split("/").pop();
+        positions[key] = { x: rect.left, y: rect.top };
+        active = null;
+      }
+    });
+  }
+
+  // =============== TIMER ==================
+  function startTimer() {
+    startTime = new Date();
+    timerInterval = setInterval(() => {
+      totalSeconds = Math.floor((new Date() - startTime) / 1000);
+      totalTimeDisplay.textContent = totalSeconds;
+    }, 1000);
+  }
+
+  // =============== QUESTIONS ==================
+  function recordAnswer(type, answer) {
+    if (type === "attention") {
+      attentionAnswer = answer;
+      document.getElementById("q1").style.display = "none";
+      document.getElementById("q2").style.display = "block";
+    } else {
+      deviceAnswer = answer;
+      questions.classList.remove("visible");
+      saveCSV();
+      endScreen.classList.add("visible");
+    }
+  }
+
+  // =============== SAVE CSV ==================
+  function saveCSV() {
+    let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
+    for (let key in positions) {
+      const p = positions[key];
+      csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}\n`;
+    }
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `arrangement_${participantID}.csv`;
+    a.click();
+  }
+
+  // =============== KEY CONTROLS ==================
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space" && !arenaVisible) {
+      instruction.classList.remove("visible");
+      arenaContainer.style.display = "block";
+      loadImages();
+      enableDragging();
+      arenaVisible = true;
+      startTimer();
+    } else if (e.code === "Enter" && arenaVisible) {
+      arenaContainer.style.display = "none";
+      clearInterval(timerInterval);
+      questions.classList.add("visible");
+    }
+  });
+</script>
 </body>
 </html>
