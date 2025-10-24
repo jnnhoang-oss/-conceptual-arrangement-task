@@ -39,7 +39,7 @@
   }
   .image {
     position: absolute;
-    width: 80px; height: 80px;
+    width: 20px; height: 20px;
     border-radius: 10px;
     cursor: grab;
     transition: transform 0.05s linear;
@@ -95,7 +95,7 @@
   </div>
 
 <script>
-  // =============== GLOBALS ==================
+  //~~~~~~~~` Whatever ~~~~~~
   const arenaContainer = document.getElementById("arenaContainer");
   const arena = document.getElementById("arena");
   const instruction = document.getElementById("instruction");
@@ -111,8 +111,8 @@
   let totalSeconds = 0;
   let arenaVisible = false;
 
-  // =============== IMAGE SETUP ==================
-  const imageFolder = "images/"; // your image folder
+  // ~~~~~~~ IMG ~~~~~~~
+  const imageFolder = ".github/wth/";
   const imageNames = [
     "aardvark.jpg","anteater.jpg","camel.jpg","tiger.jpg","rabbit.jpg","horse.jpg"
   ];
@@ -128,7 +128,7 @@
     });
   }
 
-  // =============== DRAGGING ==================
+  // ~~~~~~` DRAGGING ~~~~~~~`
   let active = null;
   let offsetX = 0, offsetY = 0;
 
@@ -160,7 +160,7 @@
     });
   }
 
-  // =============== TIMER ==================
+  // ~~~~~~~~~TIMER ~~~~~~~`
   function startTimer() {
     startTime = new Date();
     timerInterval = setInterval(() => {
@@ -169,7 +169,7 @@
     }, 1000);
   }
 
-  // =============== ARENA CHECK ==================
+  // ~~~~~~~~~~`ARENA CHECK ~~~~~~~~~~~~
   function isInsideArena(img) {
     const arenaRect = arena.getBoundingClientRect();
     const arenaCenterX = arenaRect.left + arenaRect.width / 2;
@@ -192,7 +192,7 @@
     return Array.from(imgs).every(isInsideArena);
   }
 
-  // =============== QUESTIONS ==================
+  // ~~~~~~~~~~~ QUESTIONS ~~~~~~~~~~`
   function recordAnswer(type, answer) {
     if (type === "attention") {
       attentionAnswer = answer;
@@ -206,7 +206,7 @@
     }
   }
 
-  // =============== SAVE CSV ==================
+  // ~~~~~~~~~~~~`SAVE CSV ~~~~~~~~~~~
   function saveCSV() {
     let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
     for (let key in positions) {
@@ -220,7 +220,7 @@
     a.click();
   }
 
-  // =============== KEY CONTROLS ==================
+  // ~~~~~~~~~~~ CONTROLS ~~~~~~~~~`
   document.addEventListener("keydown", e => {
     if (e.code === "Space" && !arenaVisible) {
       instruction.classList.remove("visible");
