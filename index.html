@@ -50,6 +50,11 @@
     background-color: #ffcc00; border: none; border-radius: 6px;
     cursor: pointer; font-weight: bold;
   }
+  #warningMessage {
+    position: absolute; top: 10%; width: 100%;
+    text-align: center; color: red;
+    font-weight: bold; display: none;
+  }
 </style>
 </head>
 <body>
@@ -66,6 +71,7 @@
       <p>Total Time: <span id="totalTime">0</span>s</p>
     </div>
     <div id="arenaText">Click and drag images. Press ENTER when finished.</div>
+    <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
   </div>
 
   <!-- QUESTIONS -->
@@ -89,13 +95,14 @@
   </div>
 
 <script>
-  // meh meh meh
+  // =============== GLOBALS ==================
   const arenaContainer = document.getElementById("arenaContainer");
   const arena = document.getElementById("arena");
   const instruction = document.getElementById("instruction");
   const questions = document.getElementById("questions");
   const endScreen = document.getElementById("endScreen");
   const totalTimeDisplay = document.getElementById("totalTime");
+  const warningMessage = document.getElementById("warningMessage");
 
   let participantID = prompt("Enter Participant ID:");
   let startTime, timerInterval;
@@ -104,8 +111,8 @@
   let totalSeconds = 0;
   let arenaVisible = false;
 
-  //~~~~ JPG SETUP ~~~~~ 
-  const imageFolder = ".github/wth/";
+  // =============== IMAGE SETUP ==================
+  const imageFolder = "images/"; // your image folder
   const imageNames = [
     "aardvark.jpg","anteater.jpg","camel.jpg","tiger.jpg","rabbit.jpg","horse.jpg"
   ];
@@ -121,7 +128,7 @@
     });
   }
 
-  //~~~~~ DRAG N DROP ~~~~
+  // =============== DRAGGING ==================
   let active = null;
   let offsetX = 0, offsetY = 0;
 
@@ -153,7 +160,7 @@
     });
   }
 
-  //~~~~~ TIMER ~~~~~
+  // =============== TIMER ==================
   function startTimer() {
     startTime = new Date();
     timerInterval = setInterval(() => {
@@ -162,7 +169,30 @@
     }, 1000);
   }
 
-  // QUESTIONS IDK FIX ~~ !! FIX LATER
+  // =============== ARENA CHECK ==================
+  function isInsideArena(img) {
+    const arenaRect = arena.getBoundingClientRect();
+    const arenaCenterX = arenaRect.left + arenaRect.width / 2;
+    const arenaCenterY = arenaRect.top + arenaRect.height / 2;
+    const radius = arenaRect.width / 2;
+
+    const imgRect = img.getBoundingClientRect();
+    const imgCenterX = imgRect.left + imgRect.width / 2;
+    const imgCenterY = imgRect.top + imgRect.height / 2;
+
+    const dx = imgCenterX - arenaCenterX;
+    const dy = imgCenterY - arenaCenterY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    return distance + imgRect.width / 2 < radius;
+  }
+
+  function allImagesInside() {
+    const imgs = document.querySelectorAll(".image");
+    return Array.from(imgs).every(isInsideArena);
+  }
+
+  // =============== QUESTIONS ==================
   function recordAnswer(type, answer) {
     if (type === "attention") {
       attentionAnswer = answer;
@@ -176,7 +206,7 @@
     }
   }
 
-  // ~~~ BRUH CVS FILES BRO ~~~
+  // =============== SAVE CSV ==================
   function saveCSV() {
     let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
     for (let key in positions) {
@@ -190,7 +220,7 @@
     a.click();
   }
 
-  //~~~~ CONTROLS TYPE SHI ~~~~~~
+  // =============== KEY CONTROLS ==================
   document.addEventListener("keydown", e => {
     if (e.code === "Space" && !arenaVisible) {
       instruction.classList.remove("visible");
@@ -200,9 +230,21 @@
       arenaVisible = true;
       startTimer();
     } else if (e.code === "Enter" && arenaVisible) {
-      arenaContainer.style.display = "none";
-      clearInterval(timerInterval);
-      questions.classList.add("visible");
+      const imgs = document.querySelectorAll(".image");
+      imgs.forEach(img => {
+        const rect = img.getBoundingClientRect();
+        const key = img.src.split("/").pop();
+        positions[key] = { x: rect.left, y: rect.top };
+      });
+
+      if (allImagesInside()) {
+        warningMessage.style.display = "none";
+        arenaContainer.style.display = "none";
+        clearInterval(timerInterval);
+        questions.classList.add("visible");
+      } else {
+        warningMessage.style.display = "block";
+      }
     }
   });
 </script>
