@@ -16,7 +16,9 @@ try {
   const questions = document.getElementById("questions");
   const endScreen = document.getElementById("endScreen");
 
-  // ✅ Automatically load all images in your repo
+  // ✅ Correct GitHub image base path
+  const basePath = "./.github/wth/";
+
   const imageNames = [
     "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg","carp.jpg",
     "caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg","cricket.jpg",
@@ -32,7 +34,7 @@ try {
   // Create image elements
   imageNames.forEach(name => {
     const img = document.createElement("img");
-    img.src = name;
+    img.src = basePath + name;
     img.alt = name.replace(".jpg", "");
     img.className = "image";
     img.draggable = false;
