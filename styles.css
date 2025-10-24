@@ -43,8 +43,8 @@ html, body {
   right: 10%;
   top: 50%;
   transform: translateY(-50%);
-  width: 600px;
-  height: 600px;
+  width: 700px;
+  height: 700px;
   border-radius: 50%;
   border: 4px dashed #ffcc00;
   background-color: rgba(255, 255, 255, 0.05);
