@@ -2,55 +2,82 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animal Arrangement Task</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conceptual Arrangement Task</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!-- ===== Instruction Screen ===== -->
-  <div id="instruction" class="fullscreen visible">
-    <h1>Welcome to the Arrangement Task</h1>
-    <p>Drag and drop each image into the circular arena.</p>
-    <p class="bold">Press SPACE to start.</p>
+  <!-- INSTRUCTION SCREEN -->
+  <div id="instruction" class="visible">
+    <h1>Conceptual Arrangement Task</h1>
+    <p>Thank you for participating!</p>
+    <p>
+      You will drag animal images into a circular arena and arrange them so that
+      similar animals are closer together. Press <b>SPACEBAR</b> (or tap) to begin.
+    </p>
+    <p>When all images are in the arena, press <b>ENTER</b> (or tap) to finish.</p>
   </div>
 
-  <!-- ===== Arena Screen ===== -->
+  <!-- ARENA SCREEN -->
   <div id="arenaContainer">
     <div id="arena"></div>
-    <div id="totalTime">0</div>
-
-    <!-- 10 sample images (you can load all 40+ dynamically in script.js) -->
-    <img src="aardvark.jpg" alt="aardvark" class="image">
-    <img src="anteater.jpg" alt="anteater" class="image">
-    <img src="camel.jpg" alt="camel" class="image">
-    <img src="brown_bear.jpg" alt="brown bear" class="image">
-    <img src="finch.jpg" alt="finch" class="image">
-    <img src="pelican.jpg" alt="pelican" class="image">
-    <img src="tiger.jpg" alt="tiger" class="image">
-    <img src="snail.jpg" alt="snail" class="image">
-    <img src="rabbit.jpg" alt="rabbit" class="image">
-    <img src="shark.jpg" alt="shark" class="image">
+    <div id="timerDisplay">
+      <p>Total Time: <span id="totalTime">0</span>s</p>
+    </div>
+    <div id="arenaText">
+      Place all images in the arena, then press ENTER or TAP to finish
+    </div>
   </div>
 
-  <!-- ===== Question Screen ===== -->
-  <div id="questions" class="fullscreen">
+  <!-- QUESTIONS SCREEN -->
+  <div id="questions">
     <div id="q1" class="question">
-      <p>Did you pay attention? (Be honest)</p>
-      <button onclick="recordAnswer('attention', 'Yes')">Yes</button>
-      <button onclick="recordAnswer('attention', 'No')">No</button>
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
     </div>
-    <div id="q2" class="question hidden">
-      <p>Are you using the same device as last time?</p>
-      <button onclick="recordAnswer('device', 'Yes')">Yes</button>
-      <button onclick="recordAnswer('device', 'No')">No</button>
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
     </div>
   </div>
 
-  <!-- ===== End Screen ===== -->
-  <div id="endScreen" class="fullscreen hidden">
+  <!-- END SCREEN -->
+  <div id="endScreen">
     <h2>Thank you for participating!</h2>
     <p>Your responses have been recorded.</p>
+    <p class="thank-you-note">Your participation helps advance our understanding of conceptual similarity. Thank you!</p>
   </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // Dynamically load images from .github/wth/
+    const imageFolder = ".github/wth/";
+    const imageNames = [
+      "aardvark.jpg", "anteater.jpg", "brown_bear.jpg", "camel.jpg", "canary.jpg",
+      "carp.jpg", "caterpillarhawkmoth.jpg", "catfish.jpg", "chipmunk.jpg", "cranebug.jpg",
+      "cricket.jpg", "elephantafrican.jpg", "finch.jpg", "firebug.jpg", "flea.jpg",
+      "gerbil.jpg", "giraffe.jpg", "goldfish.jpg", "halibut.jpg", "herculesbeetle.jpg",
+      "herring.jpg", "horse.jpg", "hyena.jpg", "leopard.jpg", "llama.jpg", "marmot.jpg",
+      "mouse.jpg", "ostrich.jpg", "palmcockatoo.jpg", "partridge.jpg", "pelican.jpg",
+      "perch.jpg", "pigeon.jpg", "pike.jpg", "porcupine.jpg", "prayingmantis.jpg",
+      "rabbit.jpg", "reindeer.jpg", "salmon.jpg", "shark.jpg", "sheep.jpg", "shrimp.jpg",
+      "skunk.jpg", "snail.jpg", "starfish.jpg", "tiger.jpg", "turkey.jpg", "waterbuffalo.jpg"
+    ];
+
+    const arenaContainer = document.getElementById("arenaContainer");
+
+    // Add images dynamically
+    imageNames.forEach(name => {
+      const img = document.createElement("img");
+      img.src = `${imageFolder}${name}`;
+      img.alt = name.replace(".jpg", "");
+      img.className = "image";
+      img.draggable = false;
+      arenaContainer.appendChild(img);
+    });
+  </script>
 
   <script src="script.js"></script>
 </body>
