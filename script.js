@@ -61,38 +61,62 @@ function randomizeImagePositions() {
   });
 }
 
-  function startDrag(e) {
-    if (!arenaVisible) return;
-    activeImage = e.target;
-    const rect = activeImage.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-    activeImage.style.cursor = "grabbing";
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", stopDrag);
-  }
+// ~~~~~~ DRAGGING (Smooth Version) ~~~~~~~
+let active = null;
+let offsetX = 0, offsetY = 0;
 
-  function drag(e) {
-    if (!activeImage) return;
-    const newX = e.clientX - offsetX;
-    const newY = e.clientY - offsetY;
-    activeImage.style.left = `${newX}px`;
-    activeImage.style.top = `${newY}px`;
-  }
+function enableDragging() {
+  const imgs = document.querySelectorAll(".image");
+  imgs.forEach(img => {
+    img.addEventListener("mousedown", startDrag);
+    img.addEventListener("touchstart", startDrag);
+  });
 
-  function stopDrag() {
-    if (!activeImage) return;
-    const rect = activeImage.getBoundingClientRect();
-    const dropTime = new Date();
-    const timeInSeconds = Math.floor((dropTime - startTime) / 1000);
-    const key = activeImage.src.split("/").pop();
-    positions[key] = { x: rect.left, y: rect.top, time: timeInSeconds };
-    imageTimes[key] = timeInSeconds;
-    activeImage.style.cursor = "grab";
-    activeImage = null;
-    document.removeEventListener("mousemove", drag);
-    document.removeEventListener("mouseup", stopDrag);
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("touchmove", drag);
+  document.addEventListener("mouseup", endDrag);
+  document.addEventListener("touchend", endDrag);
+}
+
+function startDrag(e) {
+  e.preventDefault();
+  active = e.target;
+
+  const rect = active.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+
+  active.style.transition = "none";
+  active.style.zIndex = 9999;
+}
+
+function drag(e) {
+  if (!active) return;
+
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  // Smoothly animate movement
+  requestAnimationFrame(() => {
+    active.style.left = `${clientX - offsetX}px`;
+    active.style.top = `${clientY - offsetY}px`;
+  });
+}
+
+function endDrag() {
+  if (active) {
+    const rect = active.getBoundingClientRect();
+    const key = active.src.split("/").pop();
+    positions[key] = { x: rect.left, y: rect.top };
+    active.style.transition = "transform 0.1s ease-out";
+    active.style.zIndex = 1;
+    active = null;
   }
+}
+
 
   function startDragTouch(e) {
     e.preventDefault();
