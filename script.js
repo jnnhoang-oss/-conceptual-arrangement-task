@@ -51,13 +51,11 @@ try {
 function randomizeImagePositions() {
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
-
   images.forEach((img) => {
     // Random X between 5% and 40% of screen width (keeps them left of arena)
     const x = Math.random() * 0.35 * screenWidth + 0.05 * screenWidth;
     // Random Y between 10% and 90% of screen height
     const y = Math.random() * 0.8 * screenHeight + 0.1 * screenHeight;
-
     img.style.left = `${x}px`;
     img.style.top = `${y}px`;
   });
