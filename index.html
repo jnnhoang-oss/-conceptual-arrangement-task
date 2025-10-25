@@ -26,7 +26,7 @@
   #arena {
     position: absolute; top: 50%; right: 15%;
     transform: translateY(-50%);
-    width: 500px; height: 500px;
+    width: 600px; height: 600px; /* adjust arena size here */
     border: 3px dashed #ffcc00; border-radius: 50%;
     background: rgba(255,255,255,0.05);
   }
@@ -39,7 +39,7 @@
   }
   .image {
     position: absolute;
-    width: 45px; height: 45px;
+    width: 55px; height: 55px;
     border-radius: 10px;
     cursor: grab;
     transition: transform 0.05s linear;
@@ -95,7 +95,6 @@
   </div>
 
 <script>
-  //~~~~~~~~` Whatever ~~~~~~
   const arenaContainer = document.getElementById("arenaContainer");
   const arena = document.getElementById("arena");
   const instruction = document.getElementById("instruction");
@@ -111,54 +110,44 @@
   let totalSeconds = 0;
   let arenaVisible = false;
 
-  // ~~~~~~~ IMG ~~~~~~~
   const imageFolder = ".github/wth/";
   const imageFiles = [
-    "aardvark.jpg", "anteater.jpg", "brown_bear.jpg", "camel.jpg",
-    "canary.jpg", "carp.jpg", "caterpillarhawkmoth.jpg", "catfish.jpg",
-    "chipmunk.jpg", "cranebug.jpg", "cricket.jpg", "elephantafrican.jpg",
-    "finch.jpg", "firebug.jpg", "flea.jpg", "gerbil.jpg", "giraffe.jpg",
-    "goldfish.jpg", "halibut.jpg", "herculesbeetle.jpg", "herring.jpg",
-    "horse.jpg", "hyena.jpg", "leopard.jpg", "llama.jpg", "marmot.jpg",
-    "mouse.jpg", "ostrich.jpg", "palmcockatoo.jpg", "partridge.jpg",
-    "pelican.jpg", "perch.jpg", "pigeon.jpg", "pike.jpg", "porcupine.jpg",
-    "prayingmantis.jpg", "rabbit.jpg", "reindeer.jpg", "salmon.jpg",
-    "shark.jpg", "sheep.jpg", "shrimp.jpg", "skunk.jpg", "snail.jpg",
-    "starfish.jpg", "tiger.jpg", "turkey.jpg", "turkey copy.jpg", "waterbuffalo.jpg"
+    "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
+    "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
+    "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
+    "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
+    "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
+    "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
+    "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
+    "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
+    "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
   ];
 
-  const arenaContainer = document.getElementById("arenaContainer");
-
-  imageFiles.forEach((file, index) => {
-    const img = document.createElement("img");
-    img.src = imageFolder + file;
-    img.alt = file.split(".")[0];
-    img.classList.add("image");
-    img.style.position = "absolute";
-    img.style.width = "60px";
-    img.style.height = "60px";
-    img.style.cursor = "grab";
-    img.style.display = "none"; // hidden until start
-    arenaContainer.appendChild(img);
-  });
-
+  // --- Create scattered images ---
   function loadImages() {
-    imageNames.forEach((name, i) => {
+    imageFiles.forEach((file) => {
       const img = document.createElement("img");
-      img.src = imageFolder + name;
-      img.className = "image";
-      img.style.left = "5%";
-      img.style.top = `${10 + i * 12}%`;
+      img.src = imageFolder + file;
+      img.alt = file.split(".")[0];
+      img.classList.add("image");
+
+      // randomize positions
+      const randomX = Math.random() * (window.innerWidth * 0.4 - 60);
+      const randomY = Math.random() * (window.innerHeight - 80);
+      img.style.left = `${randomX}px`;
+      img.style.top = `${randomY}px`;
+
       arenaContainer.appendChild(img);
     });
   }
 
-  // ~~~~~~` DRAGGING ~~~~~~~`
+  // --- Dragging functionality ---
   let active = null;
   let offsetX = 0, offsetY = 0;
 
   function enableDragging() {
     const imgs = document.querySelectorAll(".image");
+
     imgs.forEach(img => {
       img.addEventListener("mousedown", e => {
         active = e.target;
@@ -185,7 +174,7 @@
     });
   }
 
-  // ~~~~~~~~~TIMER ~~~~~~~`
+  // --- Timer ---
   function startTimer() {
     startTime = new Date();
     timerInterval = setInterval(() => {
@@ -194,7 +183,7 @@
     }, 1000);
   }
 
-  // ~~~~~~~~~~`ARENA CHECK ~~~~~~~~~~~~
+  // --- Check if inside arena ---
   function isInsideArena(img) {
     const arenaRect = arena.getBoundingClientRect();
     const arenaCenterX = arenaRect.left + arenaRect.width / 2;
@@ -217,7 +206,7 @@
     return Array.from(imgs).every(isInsideArena);
   }
 
-  // ~~~~~~~~~~~ QUESTIONS ~~~~~~~~~~`
+  // --- Record answers ---
   function recordAnswer(type, answer) {
     if (type === "attention") {
       attentionAnswer = answer;
@@ -231,7 +220,7 @@
     }
   }
 
-  // ~~~~~~~~~~~~`SAVE CSV ~~~~~~~~~~~
+  // --- Save CSV ---
   function saveCSV() {
     let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
     for (let key in positions) {
@@ -245,7 +234,7 @@
     a.click();
   }
 
-  // ~~~~~~~~~~~ CONTROLS ~~~~~~~~~`
+  // --- Controls ---
   document.addEventListener("keydown", e => {
     if (e.code === "Space" && !arenaVisible) {
       instruction.classList.remove("visible");
