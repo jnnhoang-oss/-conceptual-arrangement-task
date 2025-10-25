@@ -43,8 +43,8 @@ html, body {
   right: 10%;
   top: 50%;
   transform: translateY(-50%);
-  width: 1000px;
-  height: 1000px;
+  width: 1200px;
+  height: 1200px;
   border-radius: 50%;
   border: 4px dashed #ffcc00;
   background-color: rgba(255, 255, 255, 0.05);
@@ -68,15 +68,6 @@ html, body {
   transform: scale(1.05);
 }
 
-.placeholder {
-  border: 2px solid #999;
-  background-color: #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.8rem;
-}
 
 /* ==== Question Screens ==== */
 #questions {
