@@ -17,8 +17,7 @@ try {
   const endScreen = document.getElementById("endScreen");
 
   // jpg or wtv
-  const basePath = "./.github/wth/";
-
+  const basePath = ".github/wth/";
   const imageNames = [
     "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg","carp.jpg",
     "caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg","cricket.jpg",
