@@ -43,32 +43,28 @@ html, body {
   top: 50%;
   right: 10%;
   transform: translateY(-50%);
-  width: 45vmin;  /* 45% of viewport’s smaller side */
-  height: 45vmin;
+  width: 80vmin; /* scales dynamically with viewport */
+  height: 80vmin;
   border: 3px dashed #ffcc00;
   border-radius: 50%;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
 }
 
-
-
-/~~ images ~~/
 .image {
   position: absolute;
-  width: 50px;
-  height: 50px;
-  background-color: #444;
-  border-radius: 10px;
+  width: calc(4vmin + 20px); /* adaptive image size */
+  height: calc(4vmin + 20px);
+  border-radius: 12px;
   cursor: grab;
+  transition: transform 0.1s ease, left 0.05s ease, top 0.05s ease;
   user-select: none;
-  transition: transform 0.15s ease;
 }
 
 .image:active {
   cursor: grabbing;
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
-
 
 /* ==== Question Screens ==== */
 #questions {
