@@ -40,14 +40,14 @@ html, body {
 
 #arena {
   position: absolute;
-  right: 10%;
   top: 50%;
+  right: 10%;
   transform: translateY(-50%);
-  width: 1200px;
-  height: 1200px;
+  width: 800px;
+  height: 800px;
+  border: 3px dashed #ffcc00;
   border-radius: 50%;
-  border: 4px dashed #ffcc00;
-  background-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
 }
 
 
