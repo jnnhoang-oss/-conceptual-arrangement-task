@@ -43,8 +43,8 @@ html, body {
   top: 50%;
   right: 10%;
   transform: translateY(-50%);
-  width: 80vmin; /* scales dynamically with viewport */
-  height: 80vmin;
+  width: 100vmin; /* scales dynamically with viewport */
+  height: 100vmin;
   border: 3px dashed #ffcc00;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
