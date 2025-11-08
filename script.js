@@ -76,47 +76,6 @@ function enableDragging() {
   document.addEventListener("touchmove", drag);
   document.addEventListener("mouseup", endDrag);
   document.addEventListener("touchend", endDrag);
-}
-
-function startDrag(e) {
-  e.preventDefault();
-  active = e.target;
-
-  const rect = active.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-  offsetX = clientX - rect.left;
-  offsetY = clientY - rect.top;
-
-  active.style.transition = "none";
-  active.style.zIndex = 9999;
-}
-
-function drag(e) {
-  if (!active) return;
-
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-  // Smoothly animate movement
-  requestAnimationFrame(() => {
-    active.style.left = `${clientX - offsetX}px`;
-    active.style.top = `${clientY - offsetY}px`;
-  });
-}
-
-function endDrag() {
-  if (active) {
-    const rect = active.getBoundingClientRect();
-    const key = active.src.split("/").pop();
-    positions[key] = { x: rect.left, y: rect.top };
-    active.style.transition = "transform 0.1s ease-out";
-    active.style.zIndex = 1;
-    active = null;
-  }
-}
-
 
   function startDragTouch(e) {
     e.preventDefault();
