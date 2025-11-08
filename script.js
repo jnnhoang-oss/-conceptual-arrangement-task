@@ -40,9 +40,6 @@ try {
     img.style.position = "absolute";
     img.style.width = "20px";
     img.style.height = "20px";
-    img.style.cursor = "grab";
-    img.addEventListener("mousedown", startDrag);
-    img.addEventListener("touchstart", startDragTouch, { passive: false });
     arenaContainer.appendChild(img);
   });
 
@@ -59,51 +56,25 @@ function randomizeImagePositions() {
     img.style.left = `${x}px`;
     img.style.top = `${y}px`;
   });
-}
 
-// ~~~~~~ DRAGGING (Smooth Version) ~~~~~~~
-let active = null;
-let offsetX = 0, offsetY = 0;
+  function mouseDown(e) {
+   startX = e.clientX;
+   startY = e.clientY;
+    document.addEventListener("mousemove", mouseMove);
+    document.addEventListener("mouseup", mouseUp);
 
-function enableDragging() {
-  const imgs = document.querySelectorAll(".image");
-  imgs.forEach(img => {
-    img.addEventListener("mousedown", startDrag);
-    img.addEventListener("touchstart", startDrag);
-  });
+  function mouseMove(e) {
+    newX = starX - e.clientX
+    newY = startY - e.clientY
 
-  document.addEventListener("mousemove", drag);
-  document.addEventListener("touchmove", drag);
-  document.addEventListener("mouseup", endDrag);
-  document.addEventListener("touchend", endDrag);
+    startX = e.clientX
+    startY = e.clientY
 
-  function startDragTouch(e) {
-    e.preventDefault();
-    if (!arenaVisible || e.touches.length !== 1) return;
-    activeImage = e.target;
-    const rect = activeImage.getBoundingClientRect();
-    const touch = e.touches[0];
-    offsetX = touch.clientX - rect.left;
-    offsetY = touch.clientY - rect.top;
-    document.addEventListener("touchmove", dragTouch, { passive: false });
-    document.addEventListener("touchend", stopDragTouch);
-  }
+    img.style.top = startY + 'px'
+    img.style.left = startX + 'px'
 
-  function dragTouch(e) {
-    e.preventDefault();
-    if (!activeImage || e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    const newX = touch.clientX - offsetX;
-    const newY = touch.clientY - offsetY;
-    activeImage.style.left = `${newX}px`;
-    activeImage.style.top = `${newY}px`;
-  }
-
-  function stopDragTouch() {
-    stopDrag();
-    document.removeEventListener("touchmove", dragTouch);
-    document.removeEventListener("touchend", stopDragTouch);
-  }
+    console.log({newX, newY})
+    console.lod({startX, startY})
 
   function startTimer() {
     timerInterval = setInterval(() => {
