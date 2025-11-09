@@ -6,14 +6,14 @@ const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
 
-let participantID = prompt("Enter Participant ID:") || "P1";
+let participantID = prompt("Enter Participant ID:");
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
 
-// Your image folder
+// image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg","carp.jpg",
