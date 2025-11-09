@@ -1,52 +1,44 @@
 const arenaContainer = document.getElementById("arenaContainer");
 const arena = document.getElementById("arena");
-const instructions = document.getElementById("instructions"); // ✅ fixed id
+const instructions = document.getElementById("instructions");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
 
-let participantID = prompt("Enter Participant ID:");
+let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
 
+// Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
-  "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
-  "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
-  "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
-  "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
-  "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
-  "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
-  "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  "carp.jpg","catfish.jpg","chipmunk.jpg","elephantafrican.jpg","finch.jpg"
 ];
 
-// --- Load images into the left side ---
+// --- Load and display images ---
 function loadImages() {
   imageFiles.forEach(file => {
     const img = document.createElement("img");
     img.src = imageFolder + file;
-    img.alt = file.split(".")[0];
+    img.alt = file;
     img.classList.add("image");
 
-    // Random start position
-    const randomX = Math.random() * (window.innerWidth * 0.4 - 60);
-    const randomY = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${randomX}px`;
-    img.style.top = `${randomY}px`;
+    const x = Math.random() * (window.innerWidth * 0.4 - 60);
+    const y = Math.random() * (window.innerHeight - 80);
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
 
     arenaContainer.appendChild(img);
   });
 }
 
-// --- Dragging logic ---
-let active = null;
-let offsetX = 0, offsetY = 0;
+// --- Dragging ---
+let active = null, offsetX = 0, offsetY = 0;
 
 function enableDragging() {
   const imgs = document.querySelectorAll(".image");
@@ -56,7 +48,6 @@ function enableDragging() {
       active = e.target;
       offsetX = e.offsetX;
       offsetY = e.offsetY;
-      img.style.transition = "none"; // smoother movement
     });
   });
 
@@ -64,8 +55,8 @@ function enableDragging() {
     if (!active) return;
     const x = e.pageX - offsetX;
     const y = e.pageY - offsetY;
-    active.style.left = x + "px";
-    active.style.top = y + "px";
+    active.style.left = `${x}px`;
+    active.style.top = `${y}px`;
   });
 
   document.addEventListener("mouseup", () => {
@@ -73,7 +64,6 @@ function enableDragging() {
       const rect = active.getBoundingClientRect();
       const key = active.src.split("/").pop();
       positions[key] = { x: rect.left, y: rect.top };
-      active.style.transition = "0.1s ease-out";
       active = null;
     }
   });
@@ -88,51 +78,33 @@ function startTimer() {
   }, 1000);
 }
 
-// --- Check if image inside arena ---
+// --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
-  const arenaCenterX = arenaRect.left + arenaRect.width / 2;
-  const arenaCenterY = arenaRect.top + arenaRect.height / 2;
+  const centerX = arenaRect.left + arenaRect.width / 2;
+  const centerY = arenaRect.top + arenaRect.height / 2;
   const radius = arenaRect.width / 2;
 
   const imgRect = img.getBoundingClientRect();
   const imgCenterX = imgRect.left + imgRect.width / 2;
   const imgCenterY = imgRect.top + imgRect.height / 2;
 
-  const dx = imgCenterX - arenaCenterX;
-  const dy = imgCenterY - arenaCenterY;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  return distance + imgRect.width / 2 < radius;
+  const dx = imgCenterX - centerX;
+  const dy = imgCenterY - centerY;
+  return Math.sqrt(dx * dx + dy * dy) + imgRect.width / 2 < radius;
 }
 
 function allImagesInside() {
-  const imgs = document.querySelectorAll(".image");
-  return Array.from(imgs).every(isInsideArena);
+  return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
 }
 
-// --- Record answers ---
-function recordAnswer(type, answer) {
-  if (type === "attention") {
-    attentionAnswer = answer;
-    document.getElementById("q1").style.display = "none";
-    document.getElementById("q2").style.display = "block";
-  } else {
-    deviceAnswer = answer;
-    questions.classList.remove("visible");
-    saveCSV();
-    endScreen.classList.add("visible");
-  }
-}
-
-// --- Save results ---
+// --- Save CSV ---
 function saveCSV() {
   let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
   for (let key in positions) {
     const p = positions[key];
     csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}\n`;
   }
-
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -140,15 +112,11 @@ function saveCSV() {
   a.click();
 }
 
-// --- Start logic ---
+// --- Flow control ---
 document.getElementById("beginBtn").addEventListener("click", startTask);
-
 document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) {
-    startTask();
-  } else if (e.code === "Enter" && arenaVisible) {
-    endTask();
-  }
+  if (e.code === "Space" && !arenaVisible) startTask();
+  else if (e.code === "Enter" && arenaVisible) endTask();
 });
 
 function startTask() {
@@ -156,8 +124,8 @@ function startTask() {
   arenaContainer.style.display = "block";
   loadImages();
   enableDragging();
-  arenaVisible = true;
   startTimer();
+  arenaVisible = true;
 }
 
 function endTask() {
@@ -172,8 +140,18 @@ function endTask() {
     warningMessage.style.display = "none";
     arenaContainer.style.display = "none";
     clearInterval(timerInterval);
-    questions.classList.add("visible");
+    questions.style.display = "flex";
   } else {
     warningMessage.style.display = "block";
   }
 }
+
+// --- Question logic ---
+function recordAnswer(type, answer) {
+  if (type === "attention") {
+    attentionAnswer = answer;
+    document.getElementById("q1").style.display = "none";
+    document.getElementById("q2").style.display = "block";
+  } else {
+    deviceAnswer = answer;
+    question
