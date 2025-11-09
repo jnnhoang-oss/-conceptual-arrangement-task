@@ -14,25 +14,14 @@ let timerInterval;
   const basePath = ".github/wth/";
 
   const imageNames = [
-
     "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg","carp.jpg",
-
     "caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg","cricket.jpg",
-
     "elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg","gerbil.jpg","giraffe.jpg",
-
     "goldfish.jpg","halibut.jpg","herculesbeetle.jpg","herring.jpg","horse.jpg","hyena.jpg",
-
     "leopard.jpg","llama.jpg","marmot.jpg","mouse.jpg","ostrich.jpg","palmcockatoo.jpg",
-
     "partridge.jpg","pelican.jpg","perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg",
-
     "prayingmantis.jpg","rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg",
-
-    "shrimp.jpg","skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg",
-
-    "waterbuffalo.jpg"
-
+    "shrimp.jpg","skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg", "waterbuffalo.jpg"
   ];
 
 
@@ -112,31 +101,6 @@ function updateTimer() {
   document.getElementById("totalTime").textContent = totalTime;
 }
 
-// ---------------------- STAGE CONTROL ----------------------
-document.addEventListener("keydown", (e) => {
-  if (stage === "arranging" && e.code === "Space") {
-    if (checkAllInside()) {
-      stage = "check";
-      showOverlay("All images inside the circle. Press F to double-check.");
-    } else {
-      showWarning("⚠ Please move all images inside the arena before continuing.");
-    }
-  } else if (stage === "check" && e.key.toLowerCase() === "f") {
-    stage = "doublecheck";
-    hideOverlay();
-    showArenaText("Double-check your arrangement. Press SPACE to confirm.");
-  } else if (stage === "doublecheck" && e.code === "Space") {
-    if (checkAllInside()) {
-      stage = "finish";
-      showOverlay("All items verified! Press ENTER to finish and save.");
-    } else {
-      showWarning("⚠ Some images are still outside the circle.");
-    }
-  } else if (stage === "finish" && e.code === "Enter") {
-    saveData();
-  }
-});
-
 // ---------------------- CHECK FUNCTION ----------------------
 function checkAllInside() {
   const rect = arena.getBoundingClientRect();
@@ -156,6 +120,20 @@ function checkAllInside() {
   });
   return allInside;
 }
+
+ // --- Record answers ---
+  function recordAnswer(type, answer) {
+    if (type === "attention") {
+      attentionAnswer = answer;
+      document.getElementById("q1").style.display = "none";
+      document.getElementById("q2").style.display = "block";
+    } else {
+      deviceAnswer = answer;
+      questions.classList.remove("visible");
+      saveCSV();
+      endScreen.classList.add("visible");
+    }
+  }
 
 // ---------------------- VISUAL FEEDBACK ----------------------
 function showWarning(text) {
