@@ -6,33 +6,18 @@ const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
 
-let participantID = prompt("Enter Participant ID:");
+let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
 
-// image folder
+// Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
-  "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg","carp.jpg",
-
-    "caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg","cricket.jpg",
-
-    "elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg","gerbil.jpg","giraffe.jpg",
-
-    "goldfish.jpg","halibut.jpg","herculesbeetle.jpg","herring.jpg","horse.jpg","hyena.jpg",
-
-    "leopard.jpg","llama.jpg","marmot.jpg","mouse.jpg","ostrich.jpg","palmcockatoo.jpg",
-
-    "partridge.jpg","pelican.jpg","perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg",
-
-    "prayingmantis.jpg","rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg",
-
-    "shrimp.jpg","skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg",
-
-    "waterbuffalo.jpg"
+  "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
+  "carp.jpg","catfish.jpg","chipmunk.jpg","elephantafrican.jpg","finch.jpg"
 ];
 
 // --- Load and display images ---
