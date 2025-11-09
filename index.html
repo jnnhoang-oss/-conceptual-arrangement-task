@@ -8,55 +8,47 @@
 </head>
 <body>
 
-<!-- instruction screen -->
-<div id="instructions" style="
-  position:fixed;
-  inset:0;
-  background:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  text-align:center;
-  font-size:20px;
-  z-index:100;
-">
-  <div style="max-width:700px;">
+<!-- Instruction Screen -->
+<div id="instructions">
+  <div class="instructions-box">
     <p>In this experiment, you will use the mouse to click and drag images around the screen.</p>
     <p>Drag them from the left panel into the circular arena on the right, and arrange them so conceptually similar items are closer together.</p>
-    <p>Press the spacebar or click below to begin.</p>
+    <p>Press <b>SPACE</b> or click below to begin.</p>
+    <button id="beginBtn">Begin</button>
   </div>
-  <button id="beginBtn" style="margin-top:20px;padding:10px 20px;font-size:18px;">Begin</button>
-  <p>Press <b>SPACE</b> to start.</p>
-  
 </div>
-  <div id="arenaContainer">
-    <div id="arena"></div>
-    <div id="timerDisplay">
-      <p>Total Time: <span id="totalTime">0</span>s</p>
-    </div>
-    <div id="arenaText">Click and drag images. Press ENTER when finished.</div>
-    <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
-  </div>
-  
-  <div id="questions">
-    <div id="q1" class="question">
-      <h2>Did you pay attention (BE HONEST)?</h2>
-      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
-      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
-    </div>
-    <div id="q2" class="question" style="display:none;">
-      <h2>Are you using the same device as the first time?</h2>
-      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
-      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
-    </div>
-  </div>
 
-  <div id="endScreen">
-    <h2>Thank you for participating!</h2>
-    <p>Your responses have been recorded and uploaded.</p>
-    <p class="thank-you-note">We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements. Thank you!</p>
+<!-- Main Task Area -->
+<div id="arenaContainer">
+  <div id="arena"></div>
+  <div id="timerDisplay">
+    <p>Total Time: <span id="totalTime">0</span>s</p>
   </div>
-  <script src="script.js"></script>
+  <div id="arenaText">Click and drag images. Press ENTER when finished.</div>
+  <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
+</div>
+
+<!-- Post-task Questions -->
+<div id="questions">
+  <div id="q1" class="question">
+    <h2>Did you pay attention (BE HONEST)?</h2>
+    <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+    <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+  </div>
+  <div id="q2" class="question" style="display:none;">
+    <h2>Are you using the same device as the first time?</h2>
+    <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+    <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
+  </div>
+</div>
+
+<!-- End Screen -->
+<div id="endScreen">
+  <h2>Thank you for participating!</h2>
+  <p>Your responses have been recorded and downloaded.</p>
+  <p class="thank-you-note">We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements.</p>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
