@@ -8,45 +8,50 @@
 </head>
 <body>
 
-<!-- Instruction Screen -->
-<div id="instructions">
-  <div class="instructions-box">
-    <p>In this experiment, you will use the mouse to click and drag images around the screen.</p>
-    <p>Drag them from the left panel into the circular arena on the right, and arrange them so conceptually similar items are closer together.</p>
-    <p>Press <b>SPACE</b> or click below to begin.</p>
+<!-- 🟢 Instruction Screen -->
+<div id="instructions" class="screen visible">
+  <div class="content">
+    <h2>Conceptual Arrangement Task</h2>
+    <p>
+      In this experiment, you will use the mouse to click and drag images around the screen.
+      Drag them from the left panel into the circular arena on the right, and arrange them so conceptually similar items are closer together.
+    </p>
+    <p>Press the <b>SPACEBAR</b> or click below to begin.</p>
     <button id="beginBtn">Begin</button>
   </div>
 </div>
 
-<!-- Main Task Area -->
-<div id="arenaContainer">
+<!-- 🟣 Main Arena Container -->
+<div id="arenaContainer" class="screen">
   <div id="arena"></div>
-  <div id="timerDisplay">
-    <p>Total Time: <span id="totalTime">0</span>s</p>
-  </div>
   <div id="arenaText">Click and drag images. Press ENTER when finished.</div>
   <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
+  <div id="timerDisplay">Total Time: <span id="totalTime">0</span>s</div>
 </div>
 
-<!-- Post-task Questions -->
-<div id="questions">
+<!-- 🟡 Questions -->
+<div id="questions" class="screen">
   <div id="q1" class="question">
     <h2>Did you pay attention (BE HONEST)?</h2>
-    <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
-    <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+    <button onclick="recordAnswer('attention','Yes')">Yes</button>
+    <button onclick="recordAnswer('attention','No')">No</button>
   </div>
   <div id="q2" class="question" style="display:none;">
     <h2>Are you using the same device as the first time?</h2>
-    <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
-    <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
+    <button onclick="recordAnswer('device','Yes')">Yes</button>
+    <button onclick="recordAnswer('device','No')">No</button>
   </div>
 </div>
 
-<!-- End Screen -->
-<div id="endScreen">
-  <h2>Thank you for participating!</h2>
-  <p>Your responses have been recorded and downloaded.</p>
-  <p class="thank-you-note">We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements.</p>
+<!-- 🔵 End Screen -->
+<div id="endScreen" class="screen">
+  <div class="content">
+    <h2>Thank you for participating!</h2>
+    <p>Your responses have been recorded and downloaded as a CSV file.</p>
+    <p class="thank-you-note">
+      We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements.
+    </p>
+  </div>
 </div>
 
 <script src="script.js"></script>
