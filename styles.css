@@ -1,134 +1,83 @@
-/Screen; base wtv/
-html, body {
+body {
   margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  background-color: #222;
+  background: #111;
   color: white;
   font-family: Arial, sans-serif;
-}
-
-.fullscreen {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  text-align: center;
-  padding: 2rem;
-  flex-direction: column;
-}
-
-.bold {
-  font-weight: bold;
-  color: #ffcc00;
-}
-
-.hidden {
-  display: none;
-}
-
-/~~~~ Arena bro idek ~~~/
-#arenaContainer {
-  display: none;
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-color: #111;
   overflow: hidden;
 }
-
-#arena {
-  position: absolute;
-  top: 50%;
-  right: 10%;
-  transform: translateY(-50%);
-  width: 100vmin; /* scales dynamically with viewport */
-  height: 100vmin;
-  border: 3px dashed #ffcc00;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 40px rgba(255, 204, 0, 0.3);
-}
-
-.image {
-  position: absolute;
-  width: calc(4vmin + 20px); /* adaptive image size */
-  height: calc(4vmin + 20px);
-  border-radius: 12px;
-  cursor: grab;
-  transition: transform 0.1s ease, left 0.05s ease, top 0.05s ease;
-  user-select: none;
-}
-
-.image:active {
-  cursor: grabbing;
-  transform: scale(1.08);
-}
-
-/* ==== Question Screens ==== */
-#questions {
-  display: none;
+#instruction, #questions, #endScreen {
   text-align: center;
-}
-
-#questions.visible {
-  display: block;
-}
-
-.question {
-  margin: 2rem;
-  font-size: 1.2rem;
-}
-
-button {
-  background-color: #ffcc00;
-  border: none;
-  color: #222;
-  font-weight: bold;
-  padding: 0.7rem 1.5rem;
-  margin: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-button:hover {
-  background-color: #ffe066;
-}
-
-button:active {
-  transform: scale(0.95);
-}
-
-/end WILL PUT A THANK U NOTE !!!!/
-#endScreen {
+  width: 70%;
   display: none;
-  text-align: center;
 }
-
-#endScreen.visible {
+#instruction.visible, #questions.visible, #endScreen.visible {
   display: block;
 }
-
-/ Timer eehh... /
-#totalTime {
-  position: absolute;
-  top: 15px;
-  right: 25px;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  color: #ffcc00;
-  font-weight: bold;
-}
-
-/ tbh idk but yeah its here /
-canvas {
-  display: block;
+#arenaContainer {
+  display: none;
   width: 100vw;
   height: 100vh;
-  background-color: #ccc;
+  background: #222;
+  position: relative;
+}
+#arena {
+  position: absolute;
+  border: 5px solid white;
+  border-radius: 50%;
+  width: 80vw;
+  height: 80vw;
+  max-width: 900px;
+  max-height: 900px;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.image, .placeholder {
+  width: 50px;
+  height: 50px;
+  position: absolute;
   cursor: grab;
+  border-radius: 10px;
+}
+.question-btn {
+  background: #444;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  margin: 10px;
+  cursor: pointer;
+}
+.question-btn:hover {
+  background: #666;
+}
+#timerDisplay {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  color: white;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 5px;
+}
+#timerDisplay p {
+  margin: 5px 0;
+}
+#arenaText {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 20px;
+}
+.thank-you-note {
+  margin-top: 20px;
+  font-style: italic;
+  color: #aaa;
 }
