@@ -1,167 +1,199 @@
-const arenaContainer = document.getElementById("arenaContainer");
+const beginBtn = document.getElementById("beginBtn");
+const instructions = document.getElementById("instructions");
 const arena = document.getElementById("arena");
-const instruction = document.getElementById("instruction");
-const questions = document.getElementById("questions");
-const endScreen = document.getElementById("endScreen");
-const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
+const arenaText = document.getElementById("arenaText");
 
-let participantID = prompt("Enter Participant ID:");
-let startTime, timerInterval;
-let attentionAnswer = "", deviceAnswer = "";
-let positions = {};
-let totalSeconds = 0;
-let arenaVisible = false;
+let stage = "instructions"; // stages: instructions → arranging → check → doublecheck → finish
+let elements = [];
+let startTime = null;
+let timerInterval;
 
-const imageFolder = ".github/wth/";
-const imageFiles = [
-    "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
-    "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
-    "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
-    "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
-    "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
-    "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
-    "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
-    "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-    "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
-  ];
+// ---------------------- IMAGE LIST ----------------------
+// ⚠️ Put your image paths here
+const imageList = [
+  "images/apple.png",
+  "images/banana.png",
+  "images/car.png",
+  "images/bike.png",
+  "images/cat.png",
+  "images/dog.png"
+];
 
-  // --- Create scattered images ---
-  function loadImages() {
-    imageFiles.forEach((file) => {
-      const img = document.createElement("img");
-      img.src = imageFolder + file;
-      img.alt = file.split(".")[0];
-      img.classList.add("image");
+// ---------------------- INITIAL SETUP ----------------------
+beginBtn.addEventListener("click", startExperiment);
+document.addEventListener("keydown", (e) => {
+  if (stage === "instructions" && e.code === "Space") startExperiment();
+});
 
-      // randomize positions
-      const randomX = Math.random() * (window.innerWidth * 0.4 - 60);
-      const randomY = Math.random() * (window.innerHeight - 80);
-      img.style.left = `${randomX}px`;
-      img.style.top = `${randomY}px`;
+// ---------------------- START EXPERIMENT ----------------------
+function startExperiment() {
+  instructions.style.display = "none";
+  stage = "arranging";
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+  loadImages();
+  showArenaText("Click and drag images. Press SPACE to check when finished.");
+}
 
-      arenaContainer.appendChild(img);
-    });
+// ---------------------- LOAD IMAGES ----------------------
+function loadImages() {
+  imageList.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "draggable";
+    img.style.position = "absolute";
+    img.style.left = Math.random() * 150 + "px"; // random start position (left panel zone)
+    img.style.top = Math.random() * 500 + "px";
+    document.body.appendChild(img);
+    makeDraggable(img);
+    elements.push(img);
+  });
+}
+
+// ---------------------- DRAGGING LOGIC ----------------------
+function makeDraggable(el) {
+  let offsetX, offsetY, isDragging = false;
+
+  el.addEventListener("mousedown", startDrag);
+  el.addEventListener("touchstart", startDrag, { passive: false });
+
+  function startDrag(e) {
+    e.preventDefault();
+    isDragging = true;
+    const rect = el.getBoundingClientRect();
+    const mouseX = e.touches ? e.touches[0].clientX : e.clientX;
+    const mouseY = e.touches ? e.touches[0].clientY : e.clientY;
+    offsetX = mouseX - rect.left;
+    offsetY = mouseY - rect.top;
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDrag);
+    document.addEventListener("touchmove", drag, { passive: false });
+    document.addEventListener("touchend", stopDrag);
   }
 
-  // --- Dragging functionality ---
-  let active = null;
-  let offsetX = 0, offsetY = 0;
-
-  function enableDragging() {
-    const imgs = document.querySelectorAll(".image");
-
-    imgs.forEach(img => {
-      img.addEventListener("mousedown", e => {
-        active = e.target;
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-      });
-    });
-
-    document.addEventListener("mousemove", e => {
-      if (!active) return;
-      const x = e.pageX - offsetX;
-      const y = e.pageY - offsetY;
-      active.style.left = x + "px";
-      active.style.top = y + "px";
-    });
-
-    document.addEventListener("mouseup", () => {
-      if (active) {
-        const rect = active.getBoundingClientRect();
-        const key = active.src.split("/").pop();
-        positions[key] = { x: rect.left, y: rect.top };
-        active = null;
-      }
-    });
+  function drag(e) {
+    if (!isDragging) return;
+    const mouseX = e.touches ? e.touches[0].clientX : e.clientX;
+    const mouseY = e.touches ? e.touches[0].clientY : e.clientY;
+    el.style.left = mouseX - offsetX + "px";
+    el.style.top = mouseY - offsetY + "px";
   }
 
-  // --- Timer ---
-  function startTimer() {
-    startTime = new Date();
-    timerInterval = setInterval(() => {
-      totalSeconds = Math.floor((new Date() - startTime) / 1000);
-      totalTimeDisplay.textContent = totalSeconds;
-    }, 1000);
+  function stopDrag() {
+    isDragging = false;
+    document.removeEventListener("mousemove", drag);
+    document.removeEventListener("mouseup", stopDrag);
+    document.removeEventListener("touchmove", drag);
+    document.removeEventListener("touchend", stopDrag);
   }
+}
 
-  // --- Check if inside arena ---
-  function isInsideArena(img) {
-    const arenaRect = arena.getBoundingClientRect();
-    const arenaCenterX = arenaRect.left + arenaRect.width / 2;
-    const arenaCenterY = arenaRect.top + arenaRect.height / 2;
-    const radius = arenaRect.width / 2;
+// ---------------------- TIMER ----------------------
+function updateTimer() {
+  const totalTime = Math.floor((Date.now() - startTime) / 1000);
+  document.getElementById("totalTime").textContent = totalTime;
+}
 
-    const imgRect = img.getBoundingClientRect();
-    const imgCenterX = imgRect.left + imgRect.width / 2;
-    const imgCenterY = imgRect.top + imgRect.height / 2;
-
-    const dx = imgCenterX - arenaCenterX;
-    const dy = imgCenterY - arenaCenterY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    return distance + imgRect.width / 2 < radius;
-  }
-
-  function allImagesInside() {
-    const imgs = document.querySelectorAll(".image");
-    return Array.from(imgs).every(isInsideArena);
-  }
-
-  // --- Record answers ---
-  function recordAnswer(type, answer) {
-    if (type === "attention") {
-      attentionAnswer = answer;
-      document.getElementById("q1").style.display = "none";
-      document.getElementById("q2").style.display = "block";
+// ---------------------- STAGE CONTROL ----------------------
+document.addEventListener("keydown", (e) => {
+  if (stage === "arranging" && e.code === "Space") {
+    if (checkAllInside()) {
+      stage = "check";
+      showOverlay("All images inside the circle. Press F to double-check.");
     } else {
-      deviceAnswer = answer;
-      questions.classList.remove("visible");
-      saveCSV();
-      endScreen.classList.add("visible");
+      showWarning("⚠ Please move all images inside the arena before continuing.");
     }
+  } else if (stage === "check" && e.key.toLowerCase() === "f") {
+    stage = "doublecheck";
+    hideOverlay();
+    showArenaText("Double-check your arrangement. Press SPACE to confirm.");
+  } else if (stage === "doublecheck" && e.code === "Space") {
+    if (checkAllInside()) {
+      stage = "finish";
+      showOverlay("All items verified! Press ENTER to finish and save.");
+    } else {
+      showWarning("⚠ Some images are still outside the circle.");
+    }
+  } else if (stage === "finish" && e.code === "Enter") {
+    saveData();
   }
+});
 
-  // --- Save CSV ---
-  function saveCSV() {
-    let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
-    for (let key in positions) {
-      const p = positions[key];
-      csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}\n`;
-    }
-    const blob = new Blob([csv], { type: "text/csv" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `arrangement_${participantID}.csv`;
-    a.click();
-  }
+// ---------------------- CHECK FUNCTION ----------------------
+function checkAllInside() {
+  const rect = arena.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const radius = rect.width / 2;
+  let allInside = true;
 
-  // --- Controls ---
-  document.addEventListener("keydown", e => {
-    if (e.code === "Space" && !arenaVisible) {
-      instruction.classList.remove("visible");
-      arenaContainer.style.display = "block";
-      loadImages();
-      enableDragging();
-      arenaVisible = true;
-      startTimer();
-    } else if (e.code === "Enter" && arenaVisible) {
-      const imgs = document.querySelectorAll(".image");
-      imgs.forEach(img => {
-        const rect = img.getBoundingClientRect();
-        const key = img.src.split("/").pop();
-        positions[key] = { x: rect.left, y: rect.top };
-      });
+  elements.forEach(img => {
+    const r = img.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const dx = x - centerX;
+    const dy = y - centerY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > radius) allInside = false;
+  });
+  return allInside;
+}
 
-      if (allImagesInside()) {
-        warningMessage.style.display = "none";
-        arenaContainer.style.display = "none";
-        clearInterval(timerInterval);
-        questions.classList.add("visible");
-      } else {
-        warningMessage.style.display = "block";
-      }
-    }
+// ---------------------- VISUAL FEEDBACK ----------------------
+function showWarning(text) {
+  warningMessage.textContent = text;
+  warningMessage.style.display = "block";
+  setTimeout(() => (warningMessage.style.display = "none"), 2500);
+}
+
+function showArenaText(text) {
+  arenaText.textContent = text;
+  arenaText.style.display = "block";
+}
+
+function showOverlay(text) {
+  const overlay = document.createElement("div");
+  overlay.id = "overlay";
+  overlay.style.position = "fixed";
+  overlay.style.inset = 0;
+  overlay.style.background = "rgba(255,255,255,0.96)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.flexDirection = "column";
+  overlay.style.zIndex = "200";
+  overlay.innerHTML = `<div style='max-width:700px;text-align:center;font-size:22px;'>${text}</div>`;
+  document.body.appendChild(overlay);
+}
+
+function hideOverlay() {
+  const overlay = document.getElementById("overlay");
+  if (overlay) overlay.remove();
+}
+
+// ---------------------- SAVE CSV ----------------------
+function saveData() {
+  const rect = arena.getBoundingClientRect();
+  const data = elements.map(img => {
+    const r = img.getBoundingClientRect();
+    return {
+      file: img.src.split("/").pop(),
+      x: (r.left + r.width / 2 - rect.left).toFixed(2),
+      y: (r.top + r.height / 2 - rect.top).toFixed(2)
+    };
   });
 
+  let csv = "image,x,y\n" + data.map(d => `${d.file},${d.x},${d.y}`).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "arrangement_data.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showOverlay("✅ Thank you! Your data has been saved.");
+  clearInterval(timerInterval);
+}
