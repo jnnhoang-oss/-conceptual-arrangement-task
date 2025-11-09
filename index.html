@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Conceptual Arrangement Task</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" type='text/css' media='screen' href="styles.css" />
+<link rel="stylesheet" href="styles.css" />
 </head>
-<body>  
-    
+<body>
 <div class="app" style="display:flex;gap:30px;">
   <div id="imagePool" style="width:280px;border:2px dashed #ccc;padding:10px;">
     <h3>Image Pool</h3>
@@ -62,24 +61,26 @@
   <button id="beginBtn" style="margin-top:20px;padding:10px 20px;font-size:18px;">Begin</button>
 </div>
 
-<!-- overlay screen (for Space → F → Space → Enter transitions) -->
-<div id="overlayScreen" style="
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,0.96);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  z-index:200;
-  text-align:center;
-  font-size:20px;
-  padding:40px;
-">
-  <div id="overlayText" style="max-width:700px;line-height:1.5;color:#222;"></div>
-  <button id="continueBtn" style="margin-top:20px;padding:10px 24px;">Continue</button>
-</div>
-    
+  <div id="questions">
+    <div id="q1" class="question">
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+    </div>
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
+    </div>
+  </div>
+
+  <div id="endScreen">
+    <h2>Thank you for participating!</h2>
+    <p>Your responses have been recorded and uploaded.</p>
+    <p class="thank-you-note">We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements. Thank you!</p>
+  </div>
+
+
+<script src="script.js"></script>
 </body>
-<script scr='script.js'></script>
 </html>
