@@ -1,278 +1,258 @@
-/* ==========================================================
-   ARRANGEMENT TASK — COMPLETE JAVASCRIPT LOGIC (2025)
-   ========================================================== */
+let participantID = prompt("Enter your Participant ID:");
+let startTime, endTime, arenaVisible = false;
+let attentionAnswer = "", deviceAnswer = "";
+let positions = {};
+let imageTimes = {};
+let timerInterval;
 
-/* ---------- Helper functions ---------- */
-function el(id) { return document.getElementById(id); }
-function showMsg(text, ms = 1800) {
-  const msg = el("floatingMsg");
-  msg.textContent = text;
-  msg.style.display = "block";
-  clearTimeout(msg._t);
-  msg._t = setTimeout(() => (msg.style.display = "none"), ms);
-}
+const instruction = document.getElementById("instruction");
+const arenaContainer = document.getElementById("arenaContainer");
+const questions = document.getElementById("questions");
+const endScreen = document.getElementById("endScreen");
+const images = document.querySelectorAll(".image");
+const arena = document.getElementById("arena");
+const totalTimeDisplay = document.getElementById("totalTime");
+const timerDisplay = document.getElementById("timerDisplay");
 
-/* ---------- Participant/session info ---------- */
-const subID = "participant01"; // fixed ID for online version
-const condition = "1";
-el("sessionInfo").textContent = `Sub: ${subID} • Condition: ${condition}`;
-
-/* ---------- Stimulus configuration ---------- */
-const baseStimFolder = "stimuli";
-const sessionFolders = ["animal_session1", "animal_session2"];
-
-// 🟡 Put your actual filenames here:
-const names_session1 = [
-  // 'wolf.png', 'husky.png', ...
-];
-const names_session2 = [
-  // 'dog.png', 'cat.png', ...
-];
-
-let stimuliFiles = [];
-(function buildStimList() {
-  let id = 0;
-  for (const f of names_session1) {
-    stimuliFiles.push({ id: "s" + id++, name: f, src: `${baseStimFolder}/${sessionFolders[0]}/${f}` });
-  }
-  for (const f of names_session2) {
-    stimuliFiles.push({ id: "s" + id++, name: f, src: `${baseStimFolder}/${sessionFolders[1]}/${f}` });
-  }
-  if (stimuliFiles.length === 0) {
-    // fallback placeholders
-    for (let i = 0; i < 6; i++) {
-      stimuliFiles.push({
-        id: "ph" + i,
-        name: "placeholder_" + i,
-        src: "https://via.placeholder.com/80?text=Img" + (i + 1),
-      });
-    }
-    showMsg("⚠️ Using placeholder images. Edit the arrays in script to use your own.");
-  }
-})();
-
-/* ---------- Constants ---------- */
-const ARENA_SIZE = 680;
-const STIM_SIZE = 80;
-const LEFT_X_RANGE = [40, 260];
-const LEFT_Y_RANGE = [120, 640];
-
-/* ---------- DOM references ---------- */
-const arena = el("arena");
-const imagePool = el("imagePool");
-const downloadBtn = el("downloadBtn");
-const instructions = el("instructions");
-const beginBtn = el("beginBtn");
-const overlay = el("overlayScreen");
-const overlayText = el("overlayText");
-const continueBtn = el("continueBtn");
-
-let elems = [];
-let dragging = null;
-let dragOffset = { x: 0, y: 0 };
-let finished = false;
-
-/* ---------- Utility ---------- */
-function randIn(a, b) { return a + Math.random() * (b - a); }
-function getArenaRect() { return arena.getBoundingClientRect(); }
-function isInsideCircle(x, y) {
-  const cx = ARENA_SIZE / 2;
-  const cy = ARENA_SIZE / 2;
-  const dx = x - cx, dy = y - cy;
-  return dx * dx + dy * dy <= Math.pow(ARENA_SIZE / 2 - STIM_SIZE / 2, 2);
-}
-
-/* ---------- Create image elements ---------- */
-function createStimuli() {
-  const app = document.querySelector(".app").getBoundingClientRect();
-  for (const stim of stimuliFiles) {
-    const node = document.createElement("div");
-    node.className = "stim";
-    const img = document.createElement("img");
-    img.src = stim.src;
-    img.alt = stim.name;
-    node.appendChild(img);
-    document.body.appendChild(node);
-
-    const item = {
-      id: stim.id,
-      name: stim.name,
-      el: node,
-      x: app.left + randIn(LEFT_X_RANGE[0], LEFT_X_RANGE[1]),
-      y: app.top + randIn(LEFT_Y_RANGE[0], LEFT_Y_RANGE[1]),
-      inArena: false,
-    };
-    node.style.position = "absolute";
-    node.style.left = item.x + "px";
-    node.style.top = item.y + "px";
-    elems.push(item);
-  }
-}
-createStimuli();
-
-/* ---------- Smooth dragging ---------- */
-document.addEventListener("pointerdown", (e) => {
-  const target = e.target.closest(".stim");
-  if (!target) return;
-  e.preventDefault();
-  dragging = elems.find((it) => it.el === target);
-  const rect = target.getBoundingClientRect();
-  dragOffset = { x: e.pageX - rect.left, y: e.pageY - rect.top };
-  target.setPointerCapture(e.pointerId);
-  target.style.transition = "none";
-  target.style.zIndex = 1000;
-});
-
-document.addEventListener("pointermove", (e) => {
-  if (!dragging) return;
-  e.preventDefault();
-  const node = dragging.el;
-  const newX = e.pageX - dragOffset.x;
-  const newY = e.pageY - dragOffset.y;
-  node.style.left = newX + "px";
-  node.style.top = newY + "px";
-});
-
-document.addEventListener("pointerup", (e) => {
-  if (!dragging) return;
-  const node = dragging.el;
-  node.releasePointerCapture(e.pointerId);
-  node.style.transition = "transform 0.1s ease-out";
-  const rect = node.getBoundingClientRect();
-  const arenaR = getArenaRect();
-  const cx = rect.left + rect.width / 2 - arenaR.left;
-  const cy = rect.top + rect.height / 2 - arenaR.top;
-
-  if (isInsideCircle(cx, cy)) {
-    node.style.left = arenaR.left + cx - rect.width / 2 + "px";
-    node.style.top = arenaR.top + cy - rect.height / 2 + "px";
-    dragging.inArena = true;
-    dragging.arenaX = cx;
-    dragging.arenaY = cy;
-  } else {
-    dragging.inArena = false;
-  }
-  dragging = null;
-});
-
-/* ---------- Check function ---------- */
-function checkAllInside() {
-  const arenaR = getArenaRect();
-  for (const item of elems) {
-    const rect = item.el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2 - arenaR.left;
-    const cy = rect.top + rect.height / 2 - arenaR.top;
-    if (!isInsideCircle(cx, cy)) return false;
-  }
-  return true;
-}
-
-/* ---------- CSV helpers ---------- */
-function downloadBlob(text, name) {
-  const blob = new Blob([text], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-/* ---------- Finish function ---------- */
-function attemptFinish() {
-  const arenaR = getArenaRect();
-  const coordsRows = [["SubID", "Condition", "Image", "X", "Y"]];
-  for (const item of elems) {
-    const rect = item.el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2 - arenaR.left;
-    const cy = rect.top + rect.height / 2 - arenaR.top;
-    coordsRows.push([subID, condition, item.name, cx.toFixed(2), cy.toFixed(2)]);
-  }
-  const csv1 = coordsRows.map((r) => r.join(",")).join("\n");
-  downloadBlob(csv1, `${subID}_coords_c${condition}.csv`);
-
-  const distRows = [["Image1", "Image2", "Distance"]];
-  for (let i = 0; i < elems.length; i++) {
-    for (let j = i + 1; j < elems.length; j++) {
-      const a = elems[i], b = elems[j];
-      const dx = (a.arenaX || 0) - (b.arenaX || 0);
-      const dy = (a.arenaY || 0) - (b.arenaY || 0);
-      distRows.push([a.name, b.name, Math.sqrt(dx * dx + dy * dy).toFixed(2)]);
-    }
-  }
-  const csv2 = distRows.map((r) => r.join(",")).join("\n");
-  downloadBlob(csv2, `${subID}_pairwise_c${condition}.csv`);
-
-  finished = true;
-}
-
-/* ---------- Overlay system ---------- */
-let taskStage = "instructions"; // arranging, check, doublecheck, finish, done
-
-function showOverlay(html, nextStage) {
-  overlayText.innerHTML = html;
-  overlay.style.display = "flex";
-  continueBtn.onclick = () => {
-    overlay.style.display = "none";
-    taskStage = nextStage;
-    if (nextStage === "arranging") showMsg("You can now drag and arrange images.");
+images.forEach(img => {
+  img.addEventListener("mousedown", startDrag);
+  img.addEventListener("touchstart", startDragTouch, { passive: false });
+  // Log image loading errors
+  img.onerror = () => {
+    console.error(`Failed to load image: ${img.src}`);
   };
+});
+
+function initializeTimerDisplay() {
+  images.forEach(img => {
+    const filename = img.src.split('/').pop().replace('.jpg', '');
+    const p = document.createElement("p");
+    p.innerHTML = `${filename}: <span id="time_${filename}">0</span>s`;
+    timerDisplay.appendChild(p);
+  });
 }
 
-/* ---------- Keyboard control ---------- */
-document.addEventListener("keydown", (e) => {
-  if (taskStage === "arranging" && e.code === "Space") {
-    e.preventDefault();
-    if (checkAllInside()) {
-      showOverlay(`
-        ✅ All items are inside.<br><br>
-        Please review your arrangement.<br><br>
-        When ready, press <strong>F</strong> to return and adjust.
-      `, "check");
-    } else {
-      showMsg("Some images are outside. Fix them and press Space again.");
+function randomizeImagePositions() {
+  const minTop = 10; // 10% from top
+  const maxTop = 90; // 90% from top
+  const range = maxTop - minTop;
+  const totalImages = images.length;
+  const spacing = range / totalImages; // Distribute images to avoid overlap
+
+  // Shuffle indices to randomize order
+  const indices = Array.from({ length: totalImages }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  images.forEach((img, index) => {
+    const positionIndex = indices[index];
+    const topPercent = minTop + positionIndex * spacing;
+    img.style.left = '5%';
+    img.style.top = `${topPercent}%`;
+  });
+}
+
+let activeImage = null;
+
+function startDrag(e) {
+  activeImage = e.target;
+  document.addEventListener("mousemove", drag);
+  document.addEventListener("mouseup", stopDrag);
+}
+
+function startDragTouch(e) {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    activeImage = e.target;
+    document.addEventListener("touchmove", dragTouch, { passive: false });
+    document.addEventListener("touchend", stopDragTouch);
+    document.addEventListener("touchcancel", stopDragTouch);
+  }
+}
+
+function isWithinArena(x, y) {
+  const arenaRect = arena.getBoundingClientRect();
+  const arenaCenterX = arenaRect.left + arenaRect.width / 2;
+  const arenaCenterY = arenaRect.top + arenaRect.height / 2;
+  const radius = arenaRect.width / 2 - 25; // Adjust for image size (50px / 2)
+  const distance = Math.sqrt(
+    Math.pow(x - arenaCenterX, 2) + Math.pow(y - arenaCenterY, 2)
+  );
+  return distance <= radius;
+}
+
+function areAllImagesInArena() {
+  return Array.from(images).every(img => {
+    const rect = img.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    return isWithinArena(centerX, centerY);
+  });
+}
+
+function drag(e) {
+  if (!activeImage) return;
+  let newX = e.pageX - 25; // Center of 50px image
+  let newY = e.pageY - 25;
+  if (isWithinArena(newX + 25, newY + 25)) {
+    activeImage.style.left = newX + "px";
+    activeImage.style.top = newY + "px";
+  }
+}
+
+function dragTouch(e) {
+  e.preventDefault();
+  if (!activeImage || e.touches.length !== 1) return;
+  const touch = e.touches[0];
+  let newX = touch.pageX - 25;
+  let newY = touch.pageY - 25;
+  if (isWithinArena(newX + 25, newY + 25)) {
+    activeImage.style.left = newX + "px";
+    activeImage.style.top = newY + "px";
+  }
+}
+
+function handleDrop() {
+  if (activeImage) {
+    const rect = activeImage.getBoundingClientRect();
+    const dropTime = new Date();
+    const timeInSeconds = Math.floor((dropTime - startTime) / 1000);
+    positions[activeImage.src] = {
+      x: rect.left,
+      y: rect.top,
+      time: timeInSeconds
+    };
+    imageTimes[activeImage.src] = timeInSeconds;
+    updateImageTimerDisplay(activeImage.src, timeInSeconds);
+  }
+  activeImage = null;
+}
+
+function stopDrag() {
+  handleDrop();
+  document.removeEventListener("mousemove", drag);
+  document.removeEventListener("mouseup", stopDrag);
+}
+
+function stopDragTouch() {
+  handleDrop();
+  document.removeEventListener("touchmove", dragTouch);
+  document.removeEventListener("touchend", stopDragTouch);
+  document.removeEventListener("touchcancel", stopDragTouch);
+}
+
+function updateImageTimerDisplay(src, time) {
+  const filename = src.split('/').pop().replace('.jpg', '');
+  const timeDisplay = document.getElementById(`time_${filename}`);
+  if (timeDisplay) {
+    timeDisplay.textContent = time;
+  }
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    if (startTime && arenaVisible) {
+      const currentTime = new Date();
+      const elapsed = Math.floor((currentTime - startTime) / 1000);
+      totalTimeDisplay.textContent = elapsed;
     }
-  } else if (taskStage === "check" && e.key.toLowerCase() === "f") {
-    e.preventDefault();
-    showOverlay(`
-      🔁 Double-check your arrangement.<br><br>
-      Adjust positions if necessary.<br><br>
-      When ready, press <strong>Space</strong> again to confirm.
-    `, "doublecheck");
-  } else if (taskStage === "doublecheck" && e.code === "Space") {
-    e.preventDefault();
-    if (checkAllInside()) {
-      showOverlay(`
-        ✅ Final check complete.<br><br>
-        Press <strong>Enter</strong> to finish and download your results.
-      `, "finish");
+  }, 1000);
+}
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && !arenaVisible) {
+    instruction.classList.remove("visible");
+    arenaContainer.style.display = "block";
+    randomizeImagePositions();
+    initializeTimerDisplay();
+    startTime = new Date();
+    arenaVisible = true;
+    startTimer();
+  } else if (e.code === "Enter" && arenaVisible) {
+    if (areAllImagesInArena()) {
+      arenaVisible = false;
+      arenaContainer.style.display = "none";
+      stopTimer();
+      showQuestions();
     } else {
-      showMsg("Some images are outside. Fix and press Space again.");
+      alert("Please place all images inside the arena before proceeding.");
     }
-  } else if (taskStage === "finish" && e.key === "Enter") {
-    e.preventDefault();
-    attemptFinish();
-    showOverlay(`
-      🎉 Task complete!<br><br>
-      CSV files have been downloaded.<br><br>
-      Thank you for participating!
-    `, "done");
   }
 });
 
-/* ---------- Start experiment ---------- */
-function startExperiment() {
-  instructions.style.display = "none";
-  showMsg("Experiment started. Drag images into the arena.");
-  taskStage = "arranging";
-}
-beginBtn.addEventListener("click", startExperiment);
-document.addEventListener("keydown", (e) => {
-  if (e.code === "Space" && instructions.style.display !== "none") {
-    e.preventDefault();
-    startExperiment();
+document.addEventListener("touchstart", e => {
+  if (!arenaVisible && e.target.tagName !== "BUTTON") {
+    instruction.classList.remove("visible");
+    arenaContainer.style.display = "block";
+    randomizeImagePositions();
+    initializeTimerDisplay();
+    startTime = new Date();
+    arenaVisible = true;
+    startTimer();
+  } else if (arenaVisible && e.target.tagName !== "IMG") {
+    if (areAllImagesInArena()) {
+      arenaVisible = false;
+      arenaContainer.style.display = "none";
+      stopTimer();
+      showQuestions();
+    } else {
+      alert("Please place all images inside the arena before proceeding.");
+    }
   }
 });
 
-window.addEventListener("load", () => {
-  showMsg("Ready. Press Begin or Space to start.");
-});
+function showQuestions() {
+  endTime = new Date();
+  totalSeconds = Math.floor((endTime - startTime) / 1000);
+  questions.classList.add("visible");
+}
+
+function recordAnswer(type, answer) {
+  if (type === "attention") {
+    attentionAnswer = answer;
+    document.getElementById("q1").style.display = "none";
+    document.getElementById("q2").style.display = "block";
+  } else if (type === "device") {
+    deviceAnswer = answer;
+    questions.classList.remove("visible");
+    saveCSV();
+    showEndMessage();
+  }
+}
+
+async function saveCSV() {
+  let csv = "ParticipantID,TotalTime(s),Attention,Device,Image,PosX,PosY,ImageTime(s)\n";
+  for (let key in positions) {
+    const filename = key.split('/').pop();
+    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${filename},${positions[key].x},${positions[key].y},${imageTimes[key] || 0}\n`;
+  }
+
+  const backendUrl = 'https://your-backend-url/upload-csv'; // Replace with your actual backend URL
+
+  try {
+    const response = await fetch(backendUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ csvContent: csv, participantID }),
+    });
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+    console.log('CSV uploaded to GitHub!');
+  } catch (error) {
+    console.error('Error:', error);
+    // Fallback: Download locally
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `arrangement_${participantID}.csv`;
+    a.click();
+  }
+}
+
+function showEndMessage() {
+  endScreen.classList.add("visible");
+}
