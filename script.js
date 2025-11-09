@@ -1,18 +1,30 @@
-let participantID = prompt("Enter your Participant ID:");
-let startTime, endTime, arenaVisible = false;
-let attentionAnswer = "", deviceAnswer = "";
-let positions = {};
-let imageTimes = {};
-let timerInterval;
-
-const instruction = document.getElementById("instruction");
 const arenaContainer = document.getElementById("arenaContainer");
+const arena = document.getElementById("arena");
+const instruction = document.getElementById("instruction");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
-const images = document.querySelectorAll(".image");
-const arena = document.getElementById("arena");
 const totalTimeDisplay = document.getElementById("totalTime");
-const timerDisplay = document.getElementById("timerDisplay");
+const warningMessage = document.getElementById("warningMessage");
+
+let participantID = prompt("Enter Participant ID:");
+let startTime, timerInterval;
+let attentionAnswer = "", deviceAnswer = "";
+let positions = {};
+let totalSeconds = 0;
+let arenaVisible = false;
+
+const imageFolder = ".github/wth/";
+const imageFiles = [
+    "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
+    "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
+    "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
+    "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
+    "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
+    "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
+    "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
+    "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
+    "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  ];
 
 images.forEach(img => {
   img.addEventListener("mousedown", startDrag);
