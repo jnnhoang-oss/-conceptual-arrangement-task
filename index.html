@@ -6,8 +6,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" type='text/css' media='screen' href="styles.css" />
 </head>
-<body>
-  
+<body>  <div id="instruction" class="visible">
+    <h1>Conceptual Arrangement Task</h1>
+    <p>Thank you for participating!</p>
+    <p>In this experiment, you will use the mouse or touch to drag images around the screen. Press the <b>spacebar</b> or <b>tap the screen</b> to start. A set of images will appear on the left side of the screen. Your task is to drag and drop these images into the circular arena on the right and arrange them so that more conceptually similar items are placed closer together, and more dissimilar items are placed farther apart.</p>
+    <p>You can move each image as many times as needed to ensure the arrangement reflects conceptual similarity. For example, if you have a wolf and a husky, you might place them close together. If another husky is present, you might place the two huskies closer to each other than to the wolf.</p>
+    <p>You may form several clusters of somewhat similar items after one round of arrangement. Once clustered, you might notice more nuanced differences between them. Please take the time to adjust the distances within and between clusters, as both are significant.</p>
+    <p>When you are satisfied with your arrangement and all images are in the arena, press <b>Enter</b> or <b>tap the screen</b> to proceed.</p>
+  </div>
+
+  <div id="arenaContainer">
+    <div id="arena"></div>
+    <div id="timerDisplay">
+      <p>Total Time: <span id="totalTime">0</span>s</p>
+      <!-- Timer entries for images will be dynamically generated in script.js -->
+    </div>
+    <img src=".github/wth/aardvark.jpg" class="image">
+    <img src=".github/wth/anteater.jpg" class="image">
+    <img src=".github/wth/brown_bear.jpg" class="image">
+    <img src=".github/wth/camel.jpg" class="image">
+    <img src=".github/wth/canary.jpg" class="image">
+    <img src=".github/wth/carp.jpg" class="image">
+    <img src=".github/wth/caterpillarhawkmoth.jpg" class="image">
+    <img src=".github/wth/catfish.jpg" class="image">
+    <img src=".github/wth/chipmunk.jpg" class="image">
+    <img src=".github/wth/cranebug.jpg" class="image">
+    <img src=".github/wth/cricket.jpg" class="image">
+    <img src=".github/wth/elephantafrican.jpg" class="image">
+    <img src=".github/wth/finch.jpg" class="image">
+    <img src=".github/wth/firebug.jpg" class="image">
+    <img src=".github/wth/flea.jpg" class="image">
+    <img src=".github/wth/gerbil.jpg" class="image">
+    <img src=".github/wth/giraffe.jpg" class="image">
+    <img src=".github/wth/goldfish.jpg" class="image">
+    <img src=".github/wth/halibut.jpg" class="image">
+    <img src=".github/wth/herculesbeetle.jpg" class="image">
+    <img src=".github/wth/herring.jpg" class="image">
+    <img src=".github/wth/horse.jpg" class="image">
+    <img src=".github/wth/hyena.jpg" class="image">
+    <img src=".github/wth/leopard.jpg" class="image">
+    <img src=".github/wth/llama.jpg" class="image">
+    <img src=".github/wth/marmot.jpg" class="image">
+    <img src=".github/wth/mouse.jpg" class="image">
+    <img src=".github/wth/ostrich.jpg" class="image">
+    <img src=".github/wth/palmcockatoo.jpg" class="image">
+    <img src=".github/wth/partridge.jpg" class="image">
+    <img src=".github/wth/pelican.jpg" class="image">
+    <img src=".github/wth/perch.jpg" class="image">
+    <img src=".github/wth/pigeon.jpg" class="image">
+    <img src=".github/wth/pike.jpg" class="image">
+    <img src=".github/wth/porcupine.jpg" class="image">
+    <img src=".github/wth/prayingmantis.jpg" class="image">
+    <img src=".github/wth/rabbit.jpg" class="image">
+    <img src=".github/wth/reindeer.jpg" class="image">
+    <img src=".github/wth/salmon.jpg" class="image">
+    <img src=".github/wth/shark.jpg" class="image">
+    <img src=".github/wth/sheep.jpg" class="image">
+    <img src=".github/wth/shrimp.jpg" class="image">
+    <img src=".github/wth/skunk.jpg" class="image">
+    <img src=".github/wth/snail.jpg" class="image">
+    <img src=".github/wth/starfish.jpg" class="image">
+    <img src=".github/wth/tiger.jpg" class="image">
+    <img src=".github/wth/turkey.jpg" class="image">
+    <img src=".github/wth/waterbuffalo.jpg" class="image">
+    <div id="arenaText">
+      Place all images in the arena, then press ENTER or TAP to finish
+    </div>
+  </div>
+
+  <div id="questions">
+    <div id="q1" class="question">
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button class="question-btn" onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('attention','No')">No</button>
+    </div>
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button class="question-btn" onclick="recordAnswer('device','Yes')">Yes</button>
+      <button class="question-btn" onclick="recordAnswer('device','No')">No</button>
+    </div>
+  </div>
+
+  <div id="endScreen">
+    <h2>Thank you for participating!</h2>
+    <p>Your responses have been recorded and uploaded.</p>
+    <p class="thank-you-note">We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements. Thank you!</p>
+  </div>
+
+    </div>
 </body>
 <script scr='script.js'></script>
 </html>
