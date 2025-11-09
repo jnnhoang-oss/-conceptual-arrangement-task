@@ -6,7 +6,7 @@ const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
 
-let participantID = prompt("Enter Participant ID:") || "P1";
+let participantID = prompt("Enter Participant ID:");
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
