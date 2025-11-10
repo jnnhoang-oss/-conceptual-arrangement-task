@@ -70,22 +70,16 @@ html, body {
 }
 
 /* 🟣 Arena Section */
-#arenaContainer {
-  background: #fafafa;
-  position: relative;
-  display: none;
-}
-
-#arena {
-  position: absolute;
-  right: 5%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 50%;
-  height: 80%;
-  border: 3px dashed #0077ff;
-  border-radius: 50%;
-  background: rgba(173, 216, 230, 0.1);
+  #arenaContainer {
+    position: relative; width: 100vw; height: 100vh;
+    display: none; background: #333;
+  }
+  #arena {
+    position: absolute; top: 50%; right: 15%;
+    transform: translateY(-50%);
+    width: 600px; height: 600px; /* adjust arena size here */
+    border: 3px dashed #ffcc00; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
 }
 
 #arenaText {
