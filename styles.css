@@ -87,7 +87,7 @@ html, body {
   top: 20px;
   left: 20px;
   font-size: 18px;
-  rgba(0,0,0,0.1);
+  text: rgba(0,0,0,0.1);
 }
 
 #timerDisplay {
