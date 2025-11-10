@@ -74,6 +74,7 @@ function enableDragging() {
       active = null;
     }
   });
+}
 
 // --- Timer ---
 function startTimer() {
