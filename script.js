@@ -47,6 +47,8 @@ function loadImages() {
 // --- Dragging ---
 function initializeDragging() {
   const cards = document.querySelectorAll('.image');
+  const arena = document.getElementById('arena');
+
   cards.forEach(card => {
     card.style.position = 'absolute';
     card.addEventListener('mousedown', mouseDown);
@@ -68,7 +70,6 @@ function mouseDown(e) {
   startX = e.clientX - rect.left;
   startY = e.clientY - rect.top;
 
-  // Optional: scale up for feedback
   activeCard.style.transform = 'scale(1.1)';
   activeCard.style.transition = 'transform 0.1s';
 
@@ -80,17 +81,11 @@ function mouseMove(e) {
   e.preventDefault();
   if (!activeCard) return;
 
-  const newX = e.clientX - startX;
-  const newY = e.clientY - startY;
-
-  activeCard.style.left = newX + 'px';
-  activeCard.style.top = newY + 'px';
+  moveCard(e.clientX, e.clientY);
 }
 
 function mouseUp(e) {
   if (!activeCard) return;
-
-  // Restore scale
   activeCard.style.transform = 'scale(1)';
   activeCard = null;
 
@@ -121,16 +116,11 @@ function touchMove(e) {
   e.preventDefault();
   if (!activeCard || e.touches.length !== 1) return;
 
-  const newX = e.touches[0].clientX - startX;
-  const newY = e.touches[0].clientY - startY;
-
-  activeCard.style.left = newX + 'px';
-  activeCard.style.top = newY + 'px';
+  moveCard(e.touches[0].clientX, e.touches[0].clientY);
 }
 
 function touchEnd(e) {
   if (!activeCard) return;
-
   activeCard.style.transform = 'scale(1)';
   activeCard = null;
 
@@ -138,15 +128,33 @@ function touchEnd(e) {
   document.removeEventListener('touchend', touchEnd);
 }
 
-// Initialize dragging on page load
-window.addEventListener('load', initializeDragging);
+// ---------- Move Card with Circular Boundary ----------
+function moveCard(clientX, clientY) {
+  const arena = document.getElementById('arena');
+  const arenaRect = arena.getBoundingClientRect();
+  const arenaCenterX = arenaRect.left + arenaRect.width / 2;
+  const arenaCenterY = arenaRect.top + arenaRect.height / 2;
+  const radius = arenaRect.width / 2 - activeCard.offsetWidth / 2;
 
+  // Calculate relative position
+  let x = clientX - startX - arenaRect.left + activeCard.offsetWidth / 2;
+  let y = clientY - startY - arenaRect.top + activeCard.offsetHeight / 2;
 
-// Touch End Handler
-function touchEnd(e) {
-  activeCard = null;
-  document.removeEventListener('touchmove', touchMove);
-  document.removeEventListener('touchend', touchEnd);
+  // Calculate distance from center
+  const dx = x - arenaRect.width / 2;
+  const dy = y - arenaRect.height / 2;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // If outside circle, clip to edge
+  if (dist > radius) {
+    const angle = Math.atan2(dy, dx);
+    x = arenaRect.width / 2 + radius * Math.cos(angle);
+    y = arenaRect.height / 2 + radius * Math.sin(angle);
+  }
+
+  // Position card (top-left)
+  activeCard.style.left = (x - activeCard.offsetWidth / 2) + 'px';
+  activeCard.style.top = (y - activeCard.offsetHeight / 2) + 'px';
 }
 
 // Initialize dragging on page load
