@@ -45,52 +45,92 @@ function loadImages() {
 }
 
 // --- Dragging ---
-let activeCard = null;
-let startX = 0;
-let startY = 0;
-let offsetX = 0;
-let offsetY = 0;
+// Improved Dragging Code with Touch Support and Bounds Checking
 
-function enableDragging() {
-  const imgs = document.querySelectorAll(".image");
-
-  imgs.forEach(card => {
-    card.addEventListener("mousedown", (e) => {
-      activeCard = card;
-      startX = e.clientX;
-      startY = e.clientY;
-      offsetX = card.offsetLeft;
-      offsetY = card.offsetTop;
-      card.style.transition = "none"; // disable smooth transition while dragging
-      document.addEventListener("mousemove", mouseMove);
-      document.addEventListener("mouseup", mouseUp);
-    });
+// Function to initialize dragging on elements with class 'card'
+function initializeDragging() {
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    card.addEventListener('mousedown', mouseDown);
+    card.addEventListener('touchstart', touchStart, { passive: false });
   });
 }
 
+// Global variables
+let activeCard = null;
+let startX, startY;
+
+// Mouse Down Handler
+function mouseDown(e) {
+  e.preventDefault();
+  activeCard = e.target.closest('.card'); // Ensure we grab the card element
+  if (!activeCard) return;
+  startX = e.clientX - activeCard.getBoundingClientRect().left;
+  startY = e.clientY - activeCard.getBoundingClientRect().top;
+  document.addEventListener('mousemove', mouseMove);
+  document.addEventListener('mouseup', mouseUp);
+}
+
+// Mouse Move Handler
 function mouseMove(e) {
+  e.preventDefault();
   if (!activeCard) return;
-  
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-  
-  // Update the element's position
-  activeCard.style.left = offsetX + dx + "px";
-  activeCard.style.top = offsetY + dy + "px";
+  let newX = e.clientX - startX;
+  let newY = e.clientY - startY;
+
+  // Optional Bounds Checking (e.g., within parent container or arena)
+  const parent = activeCard.parentElement.getBoundingClientRect();
+  newX = Math.max(0, Math.min(newX, parent.width - activeCard.offsetWidth));
+  newY = Math.max(0, Math.min(newY, parent.height - activeCard.offsetHeight));
+
+  activeCard.style.left = newX + 'px';
+  activeCard.style.top = newY + 'px';
 }
 
+// Mouse Up Handler
 function mouseUp(e) {
-  if (!activeCard) return;
-  
-  // Apply a soft animation when releasing
-  activeCard.style.transition = "transform 0.15s ease-out";
-  activeCard.style.transform = "scale(1)";
-  
-  document.removeEventListener("mousemove", mouseMove);
-  document.removeEventListener("mouseup", mouseUp);
   activeCard = null;
+  document.removeEventListener('mousemove', mouseMove);
+  document.removeEventListener('mouseup', mouseUp);
 }
 
+// Touch Start Handler
+function touchStart(e) {
+  e.preventDefault();
+  if (e.touches.length !== 1) return;
+  activeCard = e.target.closest('.card');
+  if (!activeCard) return;
+  startX = e.touches[0].clientX - activeCard.getBoundingClientRect().left;
+  startY = e.touches[0].clientY - activeCard.getBoundingClientRect().top;
+  document.addEventListener('touchmove', touchMove, { passive: false });
+  document.addEventListener('touchend', touchEnd);
+}
+
+// Touch Move Handler
+function touchMove(e) {
+  e.preventDefault();
+  if (!activeCard || e.touches.length !== 1) return;
+  let newX = e.touches[0].clientX - startX;
+  let newY = e.touches[0].clientY - startY;
+
+  // Optional Bounds Checking
+  const parent = activeCard.parentElement.getBoundingClientRect();
+  newX = Math.max(0, Math.min(newX, parent.width - activeCard.offsetWidth));
+  newY = Math.max(0, Math.min(newY, parent.height - activeCard.offsetHeight));
+
+  activeCard.style.left = newX + 'px';
+  activeCard.style.top = newY + 'px';
+}
+
+// Touch End Handler
+function touchEnd(e) {
+  activeCard = null;
+  document.removeEventListener('touchmove', touchMove);
+  document.removeEventListener('touchend', touchEnd);
+}
+
+// Initialize dragging on page load
+window.addEventListener('load', initializeDragging);
 
 // --- Timer ---
 function startTimer() {
