@@ -45,86 +45,35 @@ function loadImages() {
 }
 
 // --- Dragging ---
-// --- Dragging ---
-function mouseDown(e) {
-  e.preventDefault();
-  activeCard = e.target.closest('.image');
-  if (!activeCard) return;
-  const rect = activeCard.getBoundingClientRect();
-  startX = e.clientX - rect.left;
-  startY = e.clientY - rect.top;
-  activeCard.style.transform = "scale(1.1)";
-  document.addEventListener('mousemove', mouseMove);
-  document.addEventListener('mouseup', mouseUp);
-}
+let active = null, offsetX = 0, offsetY = 0;
 
-function mouseMove(e) { e.preventDefault(); moveCard(e.clientX, e.clientY); }
-function mouseUp(e) { endDrag(); }
+function enableDragging() {
+  const imgs = document.querySelectorAll(".image");
 
-function touchStart(e) {
-  e.preventDefault();
-  if (e.touches.length !== 1) return;
-  activeCard = e.target.closest('.image');
-  if (!activeCard) return;
-  const rect = activeCard.getBoundingClientRect();
-  startX = e.touches[0].clientX - rect.left;
-  startY = e.touches[0].clientY - rect.top;
-  activeCard.style.transform = "scale(1.1)";
-  document.addEventListener('touchmove', touchMove, { passive: false });
-  document.addEventListener('touchend', touchEnd);
-}
-function touchMove(e) { e.preventDefault(); moveCard(e.touches[0].clientX, e.touches[0].clientY); }
-function touchEnd(e) { endDrag(); }
+  imgs.forEach(img => {
+    img.addEventListener("mousedown", e => {
+      active = e.target;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+    });
+  });
 
-function moveCard(clientX, clientY) {
-  if (!activeCard) return;
-  const arenaRect = arena.getBoundingClientRect();
-  const radius = arenaRect.width/2 - activeCard.offsetWidth/2;
+  document.addEventListener("mousemove", e => {
+    if (!active) return;
+    const x = e.pageX - offsetX;
+    const y = e.pageY - offsetY;
+    active.style.left = `${x}px`;
+    active.style.top = `${y}px`;
+  });
 
-  let x = clientX - startX - arenaRect.left + activeCard.offsetWidth/2;
-  let y = clientY - startY - arenaRect.top + activeCard.offsetHeight/2;
-
-  const dx = x - arenaRect.width/2;
-  const dy = y - arenaRect.height/2;
-  const dist = Math.sqrt(dx*dx + dy*dy);
-  if (dist > radius) {
-    const angle = Math.atan2(dy, dx);
-    x = arenaRect.width/2 + radius*Math.cos(angle);
-    y = arenaRect.height/2 + radius*Math.sin(angle);
-  }
-
-  activeCard.style.left = (x - activeCard.offsetWidth/2) + "px";
-  activeCard.style.top = (y - activeCard.offsetHeight/2) + "px";
-}
-
-function endDrag() {
-  if (!activeCard) return;
-  activeCard.style.transform = "scale(1)";
-  const key = activeCard.src.split("/").pop();
-  const rect = activeCard.getBoundingClientRect();
-  positions[key] = { x: rect.left, y: rect.top };
-  activeCard = null;
-  document.removeEventListener('mousemove', mouseMove);
-  document.removeEventListener('mouseup', mouseUp);
-  document.removeEventListener('touchmove', touchMove);
-  document.removeEventListener('touchend', touchEnd);
-}
-
-// --- Keyboard Controls ---
-document.addEventListener('keydown', e => {
-  if (e.code === "Space" && instructions.classList.contains("screen")) {
-    instructions.classList.add('hidden');
-    taskScreen.classList.remove('hidden');
-  } else if (e.code === "Enter" && !taskScreen.classList.contains("hidden")) {
-    const allInside = checkAllInside();
-    if (allInside) {
-      taskScreen.classList.add('hidden');
-      questions.classList.remove('hidden');
-    } else {
-      warningMessage.classList.remove('hidden');
+  document.addEventListener("mouseup", () => {
+    if (active) {
+      const rect = active.getBoundingClientRect();
+      const key = active.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+      active = null;
     }
-  }
-});
+  });
 
 // --- Timer ---
 function startTimer() {
