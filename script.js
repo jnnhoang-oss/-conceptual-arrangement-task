@@ -45,36 +45,52 @@ function loadImages() {
 }
 
 // --- Dragging ---
-let active = null, offsetX = 0, offsetY = 0;
+let activeCard = null;
+let startX = 0;
+let startY = 0;
+let offsetX = 0;
+let offsetY = 0;
 
 function enableDragging() {
   const imgs = document.querySelectorAll(".image");
 
-  imgs.forEach(img => {
-    img.addEventListener("mousedown", e => {
-      active = e.target;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
+  imgs.forEach(card => {
+    card.addEventListener("mousedown", (e) => {
+      activeCard = card;
+      startX = e.clientX;
+      startY = e.clientY;
+      offsetX = card.offsetLeft;
+      offsetY = card.offsetTop;
+      card.style.transition = "none"; // disable smooth transition while dragging
+      document.addEventListener("mousemove", mouseMove);
+      document.addEventListener("mouseup", mouseUp);
     });
   });
-
-  document.addEventListener("mousemove", e => {
-    if (!active) return;
-    const x = e.pageX - offsetX;
-    const y = e.pageY - offsetY;
-    active.style.left = `${x}px`;
-    active.style.top = `${y}px`;
-  });
-
-  document.addEventListener("mouseup", () => {
-    if (active) {
-      const rect = active.getBoundingClientRect();
-      const key = active.src.split("/").pop();
-      positions[key] = { x: rect.left, y: rect.top };
-      active = null;
-    }
-  });
 }
+
+function mouseMove(e) {
+  if (!activeCard) return;
+  
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  
+  // Update the element's position
+  activeCard.style.left = offsetX + dx + "px";
+  activeCard.style.top = offsetY + dy + "px";
+}
+
+function mouseUp(e) {
+  if (!activeCard) return;
+  
+  // Apply a soft animation when releasing
+  activeCard.style.transition = "transform 0.15s ease-out";
+  activeCard.style.transform = "scale(1)";
+  
+  document.removeEventListener("mousemove", mouseMove);
+  document.removeEventListener("mouseup", mouseUp);
+  activeCard = null;
+}
+
 
 // --- Timer ---
 function startTimer() {
