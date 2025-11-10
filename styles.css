@@ -116,13 +116,21 @@ html, body {
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   cursor: grab;
-  transition: transform 0.08s ease-in-out;
   user-select: none;
+  opacity: 0.85;              
+  transition: transform 0.08s ease-in-out, opacity 0.1s ease-in-out;
 }
+
+.image:hover {
+  opacity: 0.95;                
+}
+
 .image:active {
   cursor: grabbing;
   transform: scale(1.08);
+  opacity: 1;                  
 }
+
 
 /* 🟡 Questions */
 #questions {
