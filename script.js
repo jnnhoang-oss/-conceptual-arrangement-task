@@ -45,11 +45,8 @@ function loadImages() {
 }
 
 // --- Dragging ---
-// Improved Dragging Code with Touch Support and Bounds Checking
-
-// Function to initialize dragging on elements with class 'card'
 function initializeDragging() {
-  const cards = document.querySelectorAll('.card');
+  const cards = document.querySelectorAll('.image');
   cards.forEach(card => {
     card.addEventListener('mousedown', mouseDown);
     card.addEventListener('touchstart', touchStart, { passive: false });
@@ -63,7 +60,7 @@ let startX, startY;
 // Mouse Down Handler
 function mouseDown(e) {
   e.preventDefault();
-  activeCard = e.target.closest('.card'); // Ensure we grab the card element
+  activeCard = e.target.closest('.image'); // Ensure we grab the card element
   if (!activeCard) return;
   startX = e.clientX - activeCard.getBoundingClientRect().left;
   startY = e.clientY - activeCard.getBoundingClientRect().top;
