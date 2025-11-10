@@ -48,6 +48,7 @@ function loadImages() {
 function initializeDragging() {
   const cards = document.querySelectorAll('.image');
   cards.forEach(card => {
+    card.style.position = 'absolute';
     card.addEventListener('mousedown', mouseDown);
     card.addEventListener('touchstart', touchStart, { passive: false });
   });
@@ -55,69 +56,91 @@ function initializeDragging() {
 
 // Global variables
 let activeCard = null;
-let startX, startY;
+let startX = 0, startY = 0;
 
-// Mouse Down Handler
+// ---------- Mouse Handlers ----------
 function mouseDown(e) {
   e.preventDefault();
-  activeCard = e.target.closest('.image'); // Ensure we grab the card element
+  activeCard = e.target.closest('.image');
   if (!activeCard) return;
-  startX = e.clientX - activeCard.getBoundingClientRect().left;
-  startY = e.clientY - activeCard.getBoundingClientRect().top;
+
+  const rect = activeCard.getBoundingClientRect();
+  startX = e.clientX - rect.left;
+  startY = e.clientY - rect.top;
+
+  // Optional: scale up for feedback
+  activeCard.style.transform = 'scale(1.1)';
+  activeCard.style.transition = 'transform 0.1s';
+
   document.addEventListener('mousemove', mouseMove);
   document.addEventListener('mouseup', mouseUp);
 }
 
-// Mouse Move Handler
 function mouseMove(e) {
   e.preventDefault();
   if (!activeCard) return;
-  let newX = e.clientX - startX;
-  let newY = e.clientY - startY;
 
-  // Optional Bounds Checking (e.g., within parent container or arena)
-  const parent = activeCard.parentElement.getBoundingClientRect();
-  newX = Math.max(0, Math.min(newX, parent.width - activeCard.offsetWidth));
-  newY = Math.max(0, Math.min(newY, parent.height - activeCard.offsetHeight));
+  const newX = e.clientX - startX;
+  const newY = e.clientY - startY;
 
   activeCard.style.left = newX + 'px';
   activeCard.style.top = newY + 'px';
 }
 
-// Mouse Up Handler
 function mouseUp(e) {
+  if (!activeCard) return;
+
+  // Restore scale
+  activeCard.style.transform = 'scale(1)';
   activeCard = null;
+
   document.removeEventListener('mousemove', mouseMove);
   document.removeEventListener('mouseup', mouseUp);
 }
 
-// Touch Start Handler
+// ---------- Touch Handlers ----------
 function touchStart(e) {
   e.preventDefault();
   if (e.touches.length !== 1) return;
-  activeCard = e.target.closest('.card');
+
+  activeCard = e.target.closest('.image');
   if (!activeCard) return;
-  startX = e.touches[0].clientX - activeCard.getBoundingClientRect().left;
-  startY = e.touches[0].clientY - activeCard.getBoundingClientRect().top;
+
+  const rect = activeCard.getBoundingClientRect();
+  startX = e.touches[0].clientX - rect.left;
+  startY = e.touches[0].clientY - rect.top;
+
+  activeCard.style.transform = 'scale(1.1)';
+  activeCard.style.transition = 'transform 0.1s';
+
   document.addEventListener('touchmove', touchMove, { passive: false });
   document.addEventListener('touchend', touchEnd);
 }
 
-// Touch Move Handler
 function touchMove(e) {
   e.preventDefault();
   if (!activeCard || e.touches.length !== 1) return;
-  let newX = e.touches[0].clientX - startX;
-  let newY = e.touches[0].clientY - startY;
 
-  // Optional Bounds Checking
-  const parent = activeCard.parentElement.getBoundingClientRect();
-  newX = Math.max(0, Math.min(newX, parent.width - activeCard.offsetWidth));
-  newY = Math.max(0, Math.min(newY, parent.height - activeCard.offsetHeight));
+  const newX = e.touches[0].clientX - startX;
+  const newY = e.touches[0].clientY - startY;
 
   activeCard.style.left = newX + 'px';
   activeCard.style.top = newY + 'px';
 }
+
+function touchEnd(e) {
+  if (!activeCard) return;
+
+  activeCard.style.transform = 'scale(1)';
+  activeCard = null;
+
+  document.removeEventListener('touchmove', touchMove);
+  document.removeEventListener('touchend', touchEnd);
+}
+
+// Initialize dragging on page load
+window.addEventListener('load', initializeDragging);
+
 
 // Touch End Handler
 function touchEnd(e) {
