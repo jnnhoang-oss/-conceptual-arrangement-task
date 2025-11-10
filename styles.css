@@ -110,26 +110,29 @@ html, body {
 /* 🖼️ Images (drag targets) */
 .image {
   position: absolute;
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  border-radius: 50%;              /* 🟢 makes images circular */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   cursor: grab;
   user-select: none;
-  opacity: 0.85;              
-  transition: transform 0.08s ease-in-out, opacity 0.1s ease-in-out;
+  opacity: 0.85;                   /* 🟢 slightly translucent */
+  transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
 .image:hover {
-  opacity: 0.95;                
+  opacity: 0.95;                   /* 🟢 brighten on hover */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 .image:active {
   cursor: grabbing;
-  transform: scale(1.08);
-  opacity: 1;                  
+  transform: scale(1.1);           /* 🟢 slight pop when dragging */
+  opacity: 1;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
+
 
 
 /* 🟡 Questions */
