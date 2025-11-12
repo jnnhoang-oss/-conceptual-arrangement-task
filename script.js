@@ -163,6 +163,46 @@ function recordAnswer(type, answer) {
     deviceAnswer = answer;
     questions.style.display = "none";
     endScreen.style.display = "flex";
+    function submitGSQS() {
+  const form = document.getElementById('gsqsForm');
+  const data = new FormData(form);
+
+  const trueScores = [2,3,4,5,6,7,9,11,13,14,15];
+  const falseScores = [8,10,12];
+  let score = 0;
+
+  // Calculate total GSQS score (Q1 not counted)
+  for (let i=2; i<=15; i++) {
+    const answer = data.get('q'+i);
+    if (!answer) continue;
+    if (trueScores.includes(i) && answer === 'true') score++;
+    if (falseScores.includes(i) && answer === 'false') score++;
+  }
+
+  // Collect full data row
+  const timestamp = new Date().toISOString();
+  const participantID = localStorage.getItem('participantID') || 'P' + Math.floor(Math.random()*100000);
+  localStorage.setItem('participantID', participantID);
+
+  const row = {
+    timestamp,
+    participantID,
+    task: "GSQS",
+    score
+  };
+
+  // Save to same CSV as main task (adjust function name if different)
+  if (typeof saveData === 'function') {
+    saveData(row); // if your experiment already defines saveData()
+  } else {
+    // fallback if not defined
+    console.warn("⚠️ No saveData() function detected. Please connect this to your main experiment script.");
+  }
+
+  // hide form, show thank you page
+  form.style.display = 'none';
+  document.getElementById('thankyou').style.display = 'block';
+}
     saveCSV();
   }
 }
