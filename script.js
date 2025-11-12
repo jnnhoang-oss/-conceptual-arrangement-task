@@ -17,15 +17,7 @@ let arenaVisible = false;
 // Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
-  "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
-  "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
-  "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
-  "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
-  "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
-  "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
-  "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
-  "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  "aardvark.jpg
 ];
 
 // --- Load and display images ---
