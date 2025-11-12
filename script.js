@@ -9,6 +9,7 @@ const warningMessage = document.getElementById("warningMessage");
 let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
+let sleepAnswers = {};
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
@@ -17,14 +18,14 @@ let arenaVisible = false;
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
-    "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
-    "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
-    "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
-    "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
-    "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
-    "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
-    "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-    "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
+  "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
+  "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
+  "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
+  "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
+  "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
+  "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
+  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
 ];
 
 // --- Load and display images ---
@@ -107,11 +108,20 @@ function allImagesInside() {
 
 // --- Save CSV ---
 function saveCSV() {
-  let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
+  let csv = "ParticipantID,Time,Attention,Device,Image,X,Y";
+
+  // Add GSQS columns
+  for (let i = 1; i <= 15; i++) csv += `,GSQS_Q${i}`;
+  csv += "\n";
+
+  // Add each image position
   for (let key in positions) {
     const p = positions[key];
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}\n`;
+    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}`;
+    for (let i = 1; i <= 15; i++) csv += `,${sleepAnswers[i] || ""}`;
+    csv += "\n";
   }
+
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -159,12 +169,13 @@ function recordAnswer(type, answer) {
     attentionAnswer = answer;
     document.getElementById("q1").style.display = "none";
     document.getElementById("q2").style.display = "block";
-  } else {
+  } else if (type === "device") {
     deviceAnswer = answer;
-    questions.style.display = "none";
-    endScreen.style.display = "flex";
+    document.getElementById("q2").style.display = "none";
+    showSleepQuestionnaire();
   }
 }
+
 // --- Groningen Sleep Questionnaire ---
 const gsqsQuestions = [
   "I had a deep sleep last night",
