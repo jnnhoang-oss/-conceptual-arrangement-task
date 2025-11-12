@@ -65,21 +65,30 @@ html, body {
   cursor: pointer;
   transition: background 0.3s ease;
 }
+
 #beginBtn:hover {
   background: #005fd1;
 }
 
 /* 🟣 Arena Section */
-  #arenaContainer {
-    position: relative; width: 100vw; height: 100vh;
-    display: none; background: #333;
-  }
-  #arena {
-    position: absolute; top: 50%; right: 15%;
-    transform: translateY(-50%);
-    width: 800px; height: 800px; /* adjust arena size here */
-    border: 3px dashed #ffcc00; border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+#arenaContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  background: #333;
+}
+
+#arena {
+  position: absolute;
+  top: 50%;
+  right: 15%;
+  transform: translateY(-50%);
+  width: 800px;
+  height: 800px; /* adjust arena size here */
+  border: 3px dashed #ffcc00;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
 }
 
 #arenaText {
@@ -95,6 +104,7 @@ html, body {
   top: 20px;
   right: 20px;
   font-size: 18px;
+  color: #fff;
 }
 
 #warningMessage {
@@ -113,7 +123,7 @@ html, body {
   width: 50px;
   height: 50px;
   object-fit: cover;
-  border-radius: 50%;              /* 🟢 makes images circular */
+  border-radius: 50%;              /* 🟢 circular */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   cursor: grab;
   user-select: none;
@@ -122,22 +132,24 @@ html, body {
 }
 
 .image:hover {
-  opacity: 0.95;                   /* 🟢 brighten on hover */
+  opacity: 0.95;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 .image:active {
   cursor: grabbing;
-  transform: scale(1.1);           /* 🟢 slight pop when dragging */
+  transform: scale(1.1);
   opacity: 1;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
-
-
-/* 🟡 Questions */
+/* 🟡 Questions (Attention + GSQS) */
 #questions {
   background-color: #fffbe6;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .question {
@@ -145,16 +157,20 @@ html, body {
   padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  max-width: 600px;
+  text-align: center;
 }
 
 .question h2 {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 22px;
+  line-height: 1.4;
+  color: #333;
 }
 
 .question button {
   margin: 10px;
-  padding: 10px 20px;
+  padding: 10px 25px;
   font-size: 18px;
   background-color: #0077ff;
   color: white;
@@ -162,65 +178,20 @@ html, body {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
+  min-width: 100px;
 }
 
 .question button:hover {
   background-color: #005fd1;
 }
 
-/*Questionares */
-    font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    line-height: 1.5;
-  }
-
-  h1 {
-    text-align: center;
-    color: #2c3e50;
-  }
-
-  .question {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-  }
-
-  .question p {
-    font-weight: 500;
-  }
-
-  label {
-    display: inline-block;
-    margin-right: 20px;
-    cursor: pointer;
-  }
-
-  button {
-    display: block;
-    margin: 30px auto;
-    padding: 12px 25px;
-    background: #007acc;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: #005fa3;
-  }
-
 /* 🔵 End Screen */
 #endScreen {
   background: #e9fce9;
   display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 #endScreen .content {
@@ -228,14 +199,14 @@ html, body {
   padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  text-align: center;
+  max-width: 700px;
 }
 
 #endScreen h2 {
   font-size: 26px;
   color: #007700;
 }
-
-
 
 .thank-you-note {
   margin-top: 20px;
