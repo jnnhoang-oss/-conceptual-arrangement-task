@@ -163,46 +163,60 @@ function recordAnswer(type, answer) {
     deviceAnswer = answer;
     questions.style.display = "none";
     endScreen.style.display = "flex";
-    function submitGSQS() {
-  const form = document.getElementById('gsqsForm');
-  const data = new FormData(form);
-
-  const trueScores = [2,3,4,5,6,7,9,11,13,14,15];
-  const falseScores = [8,10,12];
-  let score = 0;
-
-  // Calculate total GSQS score (Q1 not counted)
-  for (let i=2; i<=15; i++) {
-    const answer = data.get('q'+i);
-    if (!answer) continue;
-    if (trueScores.includes(i) && answer === 'true') score++;
-    if (falseScores.includes(i) && answer === 'false') score++;
   }
-
-  // Collect full data row
-  const timestamp = new Date().toISOString();
-  const participantID = localStorage.getItem('participantID') || 'P' + Math.floor(Math.random()*100000);
-  localStorage.setItem('participantID', participantID);
-
-  const row = {
-    timestamp,
-    participantID,
-    task: "GSQS",
-    score
-  };
-
-  // Save to same CSV as main task (adjust function name if different)
-  if (typeof saveData === 'function') {
-    saveData(row); // if your experiment already defines saveData()
-  } else {
-    // fallback if not defined
-    console.warn("⚠️ No saveData() function detected. Please connect this to your main experiment script.");
-  }
-
-  // hide form, show thank you page
-  form.style.display = 'none';
-  document.getElementById('thankyou').style.display = 'block';
 }
-    saveCSV();
+// --- Groningen Sleep Questionnaire ---
+const gsqsQuestions = [
+  "I had a deep sleep last night",
+  "I feel that I slept poorly last night",
+  "It took me more than half an hour to fall asleep last night",
+  "I woke up several times last night",
+  "I felt tired after waking up this morning",
+  "I feel that I didn't get enough sleep last night",
+  "I got up in the middle of the night",
+  "I felt rested after waking up this morning",
+  "I feel that I only had a couple of hours' sleep last night",
+  "I feel that I slept well last night",
+  "I didn't sleep a wink last night",
+  "I didn't have trouble falling asleep last night",
+  "After I woke up last night, I had trouble falling asleep again",
+  "I tossed and turned all night last night",
+  "I didn't get more than 5 hours' sleep last night"
+];
+
+function showSleepQuestionnaire() {
+  questions.innerHTML = "";
+  let index = 0;
+
+  const qDiv = document.createElement("div");
+  qDiv.className = "question";
+
+  const qText = document.createElement("h2");
+  qText.textContent = gsqsQuestions[index];
+  qDiv.appendChild(qText);
+
+  const yesBtn = document.createElement("button");
+  const noBtn = document.createElement("button");
+  yesBtn.textContent = "Yes";
+  noBtn.textContent = "No";
+
+  yesBtn.onclick = () => nextGSQS("Yes");
+  noBtn.onclick = () => nextGSQS("No");
+
+  qDiv.appendChild(yesBtn);
+  qDiv.appendChild(noBtn);
+  questions.appendChild(qDiv);
+  questions.style.display = "flex";
+
+  function nextGSQS(answer) {
+    sleepAnswers[index + 1] = answer;
+    index++;
+    if (index < gsqsQuestions.length) {
+      qText.textContent = gsqsQuestions[index];
+    } else {
+      questions.style.display = "none";
+      endScreen.style.display = "flex";
+      saveCSV(); // ✅ Save everything together
+    }
   }
 }
