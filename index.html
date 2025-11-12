@@ -127,48 +127,5 @@
 </div>
 
 <script src="script.js"></script>
-
-<script>
-// 💤 GSQS Logic – integrates into same CSV saving system
-function submitGSQS() {
-  const form = document.getElementById('gsqsForm');
-  const data = new FormData(form);
-
-  const trueScores = [2,3,4,5,6,7,9,11,13,14,15];
-  const falseScores = [8,10,12];
-  let score = 0;
-
-  // Compute total GSQS score
-  for (let i = 2; i <= 15; i++) {
-    const ans = data.get('q' + i);
-    if (!ans) continue;
-    if (trueScores.includes(i) && ans === 'true') score++;
-    if (falseScores.includes(i) && ans === 'false') score++;
-  }
-
-  // Prepare row for CSV
-  const timestamp = new Date().toISOString();
-  const participantID = localStorage.getItem('participantID') || 'P' + Math.floor(Math.random() * 100000);
-  localStorage.setItem('participantID', participantID);
-
-  const row = {
-    timestamp,
-    participantID,
-    task: "GSQS",
-    score
-  };
-
-  // Save to same CSV file using existing function
-  if (typeof saveData === 'function') {
-    saveData(row);
-  } else {
-    console.warn("⚠️ No saveData() function found — connect to main script saving logic.");
-  }
-
-  // Hide GSQS, show end screen
-  document.getElementById('gsqsScreen').classList.remove('visible');
-  document.getElementById('endScreen').classList.add('visible');
-}
-</script>
 </body>
 </html>
