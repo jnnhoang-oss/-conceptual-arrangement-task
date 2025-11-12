@@ -44,7 +44,9 @@
 </div>
 
 <!--- Questionares -->
-  <form id="gsqsForm">
+  <h1>Groningen Sleep Quality Scale (GSQS)</h1>
+
+<form id="gsqsForm">
   <div class="question"><p>1. I had a deep sleep last night</p>
     <label><input type="radio" name="q1" value="true" required> Yes</label>
     <label><input type="radio" name="q1" value="false"> No</label>
@@ -120,10 +122,8 @@
     <label><input type="radio" name="q15" value="false"> No</label>
   </div>
 
-  <button type="button" onclick="calculateScore()">Submit</button>
+  <button type="button" onclick="submitGSQS()">Submit</button>
 </form>
-
-<div id="result"></div>
   
 <!-- 🔵 End Screen -->
 <div id="endScreen" class="screen">
