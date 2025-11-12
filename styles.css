@@ -168,6 +168,55 @@ html, body {
   background-color: #005fd1;
 }
 
+/*Questionares */
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    line-height: 1.5;
+  }
+
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+  }
+
+  .question {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .question p {
+    font-weight: 500;
+  }
+
+  label {
+    display: inline-block;
+    margin-right: 20px;
+    cursor: pointer;
+  }
+
+  button {
+    display: block;
+    margin: 30px auto;
+    padding: 12px 25px;
+    background: #007acc;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #005fa3;
+  }
+
 /* 🔵 End Screen */
 #endScreen {
   background: #e9fce9;
@@ -185,6 +234,8 @@ html, body {
   font-size: 26px;
   color: #007700;
 }
+
+
 
 .thank-you-note {
   margin-top: 20px;
