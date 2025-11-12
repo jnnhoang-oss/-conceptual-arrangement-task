@@ -93,6 +93,7 @@ html, body {
 
 #arenaText {
   position: absolute;
+  min-width: 300px;
   top: 20px;
   left: 20px;
   font-size: 18px;
