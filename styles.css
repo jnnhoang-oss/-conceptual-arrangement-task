@@ -82,7 +82,7 @@ html, body {
 #arena {
   position: absolute;
   top: 50%;
-  right: 15%;
+  right: 5%;
   transform: translateY(-50%);
   width: 800px;
   height: 800px; /* adjust arena size here */
