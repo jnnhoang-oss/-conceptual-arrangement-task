@@ -12,6 +12,27 @@ let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
+let gsqsAnswers = [];
+let currentGsqsIndex = 0;
+let gsqsScore = 0;
+
+const gsqsQuestions = [
+  "1. I had a deep sleep last night",
+  "2. I feel that I slept poorly last night",
+  "3. It took me more than half an hour to fall asleep last night",
+  "4. I woke up several times last night",
+  "5. I felt tired after waking up this morning",
+  "6. I feel that I didn't get enough sleep last night",
+  "7. I got up in the middle of the night",
+  "8. I felt rested after waking up this morning",
+  "9. I feel that I only had a couple of hours' sleep last night",
+  "10. I feel that I slept well last night",
+  "11. I didn't sleep a wink last night",
+  "12. I didn't have trouble falling asleep last night",
+  "13. After I woke up last night, I had trouble falling asleep again",
+  "14. I tossed and turned all night last night",
+  "15. I didn't get more than 5 hours' sleep last night"
+];
 
 // Your image folder
 const imageFolder = ".github/wth/";
@@ -97,12 +118,26 @@ function allImagesInside() {
   return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
 }
 
+// --- Calculate GSQS Score ---
+function calculateGsqsScore() {
+  gsqsScore = 0;
+  for (let i = 1; i < gsqsAnswers.length; i++) { // Skip question 1 (index 0)
+    const qNum = i + 1; // Questions 2 to 15
+    const answer = gsqsAnswers[i];
+    if ([2, 3, 4, 5, 6, 7, 9, 11, 13, 14, 15].includes(qNum)) {
+      if (answer === "Yes") gsqsScore++;
+    } else { // Questions 8, 10, 12
+      if (answer === "No") gsqsScore++;
+    }
+  }
+}
+
 // --- Save CSV ---
 function saveCSV() {
-  let csv = "ParticipantID,Time,Attention,Device,Image,X,Y\n";
+  let csv = "ParticipantID,Time,Attention,Device,GSQSScore,Image,X,Y\n";
   for (let key in positions) {
     const p = positions[key];
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}\n`;
+    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
   }
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
@@ -152,8 +187,34 @@ function recordAnswer(type, answer) {
     document.getElementById("q2").style.display = "block";
   } else {
     deviceAnswer = answer;
+    document.getElementById("q2").style.display = "none";
+    gsqsAnswers = [];
+    currentGsqsIndex = 0;
+    showGsqsQuestion();
+  }
+}
+
+function showGsqsQuestion() {
+  if (currentGsqsIndex >= gsqsQuestions.length) {
     questions.style.display = "none";
+    calculateGsqsScore();
     endScreen.style.display = "flex";
     saveCSV();
+    return;
   }
+  const q = gsqsQuestions[currentGsqsIndex];
+  questions.innerHTML = `
+    <div id="gsqs_q" style="display:block;">
+      <p>${q}</p>
+      <button onclick="recordGsqs('Yes')">Yes</button>
+      <button onclick="recordGsqs('No')">No</button>
+    </div>
+  `;
+  questions.style.display = "flex";
+}
+
+function recordGsqs(answer) {
+  gsqsAnswers.push(answer);
+  currentGsqsIndex++;
+  showGsqsQuestion();
 }
