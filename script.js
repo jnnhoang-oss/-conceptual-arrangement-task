@@ -16,6 +16,8 @@ let gsqsAnswers = [];
 let currentGsqsIndex = 0;
 let gsqsScore = 0;
 
+document.getElementById("beginBtn").addEventListener("click", startPracticeRound);
+
 const gsqsQuestions = [
   "1. I had a deep sleep last night",
   "2. I feel that I slept poorly last night",
