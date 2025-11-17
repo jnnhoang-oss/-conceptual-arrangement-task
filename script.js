@@ -1,275 +1,113 @@
-const arenaContainer = document.getElementById("arenaContainer");
-const arena = document.getElementById("arena");
-const instructions = document.getElementById("instructions");
-const questions = document.getElementById("questions");
-const endScreen = document.getElementById("endScreen");
-const totalTimeDisplay = document.getElementById("totalTime");
-const warningMessage = document.getElementById("warningMessage");
-
-let participantID = prompt("Enter Participant ID:") || "P1";
-let startTime, timerInterval;
-let attentionAnswer = "", deviceAnswer = "";
-let positions = {};
-let totalSeconds = 0;
-let arenaVisible = false;
-let gsqsAnswers = [];
-let currentGsqsIndex = 0;
-let gsqsScore = 0;
-
-document.getElementById("beginBtn").addEventListener("click", startPracticeRound);
-
-const gsqsQuestions = [
-  "1. I had a deep sleep last night",
-  "2. I feel that I slept poorly last night",
-  "3. It took me more than half an hour to fall asleep last night",
-  "4. I woke up several times last night",
-  "5. I felt tired after waking up this morning",
-  "6. I feel that I didn't get enough sleep last night",
-  "7. I got up in the middle of the night",
-  "8. I felt rested after waking up this morning",
-  "9. I feel that I only had a couple of hours' sleep last night",
-  "10. I feel that I slept well last night",
-  "11. I didn't sleep a wink last night",
-  "12. I didn't have trouble falling asleep last night",
-  "13. After I woke up last night, I had trouble falling asleep again",
-  "14. I tossed and turned all night last night",
-  "15. I didn't get more than 5 hours' sleep last night"
-];
-
-// Add this function before startTask()
-function checkFullScreen() {
-    if (!document.fullscreenElement) {
-        alert("Please enter full-screen mode before starting the task.");
-        return false;
-    }
-    return true;
-}
-
-// Modify startTask() to include full-screen check
-function startTask() {
-    if (!checkFullScreen()) return;
-    // Rest of the existing startTask() code
-}
-
-// Add these variables at the top
-let practiceRound = true;
-const practicePeriod = 30; // 30 seconds practice time
-
-function startPracticeRound() {
-    instructions.style.display = "none";
-    arenaContainer.style.display = "block";
-    
-    // Load only one random image for practice
-    const randomImage = imageFiles[Math.floor(Math.random() * imageFiles.length)];
-    const img = document.createElement("img");
-    img.src = imageFolder + randomImage;
-    img.alt = randomImage;
-    img.classList.add("image");
-    
-    const x = window.innerWidth / 2 - 30;
-    const y = window.innerHeight / 2 - 30;
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
-    arenaContainer.appendChild(img);
-    
-    enableDragging();
-    startTimer();
-    arenaVisible = true;
-    
-    // Set a timeout for practice period
-    setTimeout(() => {
-        practiceRound = false;
-        clearInterval(timerInterval);
-        // Clear practice image and reset for main task
-        arenaContainer.innerHTML = '';
-        startTask();
-    }, practicePeriod * 1000);
-}
-
-// Your image folder
-const imageFolder = ".github/wth/";
-const imageFiles = [
-  "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
-  "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
-  "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
-  "gerbil.jpg","giraffe.jpg","goldfish.jpg","halibut.jpg","herculesbeetle.jpg",
-  "herring.jpg","horse.jpg","hyena.jpg","leopard.jpg","llama.jpg","marmot.jpg",
-  "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
-  "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
-  "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
-];
-
-// --- Load and display images ---
-function loadImages() {
-  imageFiles.forEach(file => {
-    const img = document.createElement("img");
-    img.src = imageFolder + file;
-    img.alt = file;
-    img.classList.add("image");
-    const x = Math.random() * (window.innerWidth * 0.4 - 60);
-    const y = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
-    arenaContainer.appendChild(img);
-  });
-}
-
-// --- Dragging ---
-let active = null, offsetX = 0, offsetY = 0;
-function enableDragging() {
-  const imgs = document.querySelectorAll(".image");
-  imgs.forEach(img => {
-    img.addEventListener("mousedown", e => {
-      active = e.target;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-    });
-  });
-  document.addEventListener("mousemove", e => {
-    if (!active) return;
-    const x = e.pageX - offsetX;
-    const y = e.pageY - offsetY;
-    active.style.left = `${x}px`;
-    active.style.top = `${y}px`;
-  });
-  document.addEventListener("mouseup", () => {
-    if (active) {
-      const rect = active.getBoundingClientRect();
-      const key = active.src.split("/").pop();
-      positions[key] = { x: rect.left, y: rect.top };
-      active = null;
-    }
-  });
-}
-
-// --- Timer ---
-let arrangementStartTime, arrangementSeconds = 0;
-
-function startTimer() {
-    arrangementStartTime = new Date();
-    timerInterval = setInterval(() => {
-        arrangementSeconds = Math.floor((new Date() - arrangementStartTime) / 1000);
-        totalTimeDisplay.textContent = arrangementSeconds;
-    }, 1000);
-}
-
-
-// --- Check inside arena ---
-function isInsideArena(img) {
-  const arenaRect = arena.getBoundingClientRect();
-  const centerX = arenaRect.left + arenaRect.width / 2;
-  const centerY = arenaRect.top + arenaRect.height / 2;
-  const radius = arenaRect.width / 2;
-  const imgRect = img.getBoundingClientRect();
-  const imgCenterX = imgRect.left + imgRect.width / 2;
-  const imgCenterY = imgRect.top + imgRect.height / 2;
-  const dx = imgCenterX - centerX;
-  const dy = imgCenterY - centerY;
-  return Math.sqrt(dx * dx + dy * dy) + imgRect.width / 2 < radius;
-}
-
-function allImagesInside() {
-  return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
-}
-
-// --- Calculate GSQS Score ---
-function calculateGsqsScore() {
-  gsqsScore = 0;
-  for (let i = 1; i < gsqsAnswers.length; i++) { // Skip question 1 (index 0)
-    const qNum = i + 1; // Questions 2 to 15
-    const answer = gsqsAnswers[i];
-    if ([2, 3, 4, 5, 6, 7, 9, 11, 13, 14, 15].includes(qNum)) {
-      if (answer === "Yes") gsqsScore++;
-    } else { // Questions 8, 10, 12
-      if (answer === "No") gsqsScore++;
-    }
-  }
-}
-
-// --- Save CSV ---
-function saveCSV() {
-  let csv = "ParticipantID,Time,Attention,Device,GSQSScore,Image,X,Y\n";
-  for (let key in positions) {
-    const p = positions[key];
-    csv += `${participantID},${arrangementSeconds},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
-  }
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `arrangement_${participantID}.csv`;
-  a.click();
-}
-
-// --- Flow control ---
-document.getElementById("beginBtn").addEventListener("click", startTask);
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) startTask();
-  else if (e.code === "Enter" && arenaVisible) endTask();
-});
-
-function startTask() {
-  instructions.style.display = "none";
-  arenaContainer.style.display = "block";
-  loadImages();
-  enableDragging();
-  startTimer();
-  arenaVisible = true;
-}
-
-function endTask() {
-  const imgs = document.querySelectorAll(".image");
-  imgs.forEach(img => {
-    const rect = img.getBoundingClientRect();
-    const key = img.src.split("/").pop();
-    positions[key] = { x: rect.left, y: rect.top };
-  });
-  if (allImagesInside()) {
-    warningMessage.style.display = "none";
-    arenaContainer.style.display = "none";
-    clearInterval(timerInterval);
-    questions.style.display = "flex";
-  } else {
-    warningMessage.style.display = "block";
-  }
-}
-
-// --- Question logic ---
-function recordAnswer(type, answer) {
-  if (type === "attention") {
-    attentionAnswer = answer;
-    document.getElementById("q1").style.display = "none";
-    document.getElementById("q2").style.display = "block";
-  } else {
-    deviceAnswer = answer;
-    document.getElementById("q2").style.display = "none";
-    gsqsAnswers = [];
-    currentGsqsIndex = 0;
-    showGsqsQuestion();
-  }
-}
-
-function showGsqsQuestion() {
-  if (currentGsqsIndex >= gsqsQuestions.length) {
-    questions.style.display = "none";
-    calculateGsqsScore();
-    endScreen.style.display = "flex";
-    saveCSV();
-    return;
-  }
-  const q = gsqsQuestions[currentGsqsIndex];
-  questions.innerHTML = `
-    <div id="gsqs_q" style="display:block;">
-      <p>${q}</p>
-      <button onclick="recordGsqs('Yes')">Yes</button>
-      <button onclick="recordGsqs('No')">No</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conceptual Arrangement Task</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <!-- Full Screen Modal -->
+    <div id="fullScreenModal" class="modal">
+        <div class="modal-content">
+            <h2>Full Screen Required</h2>
+            <p>Please press F11 or use your browser's full-screen mode before starting the experiment.</p>
+            <button id="fullScreenBtn">I'm in Full Screen</button>
+        </div>
     </div>
-  `;
-  questions.style.display = "flex";
-}
 
-function recordGsqs(answer) {
-  gsqsAnswers.push(answer);
-  currentGsqsIndex++;
-  showGsqsQuestion();
-}
+    <!-- 🟢 Instruction Screen -->
+    <div id="instructions" class="screen visible">
+        <div class="content">
+            <h1>Conceptual Arrangement Task</h1>
+            <div class="instruction-details">
+                <p>
+                    In this experiment, you will use the mouse to click and drag images around the screen.
+                    Drag them from the left panel into the circular arena on the right, and arrange them so conceptually similar items are closer together.
+                </p>
+                <ul class="task-guidelines">
+                    <li>🖱️ Click and drag images</li>
+                    <li>🎯 Place similar images closer together</li>
+                    <li>⏱️ Time will be tracked</li>
+                </ul>
+                <div class="attention-warning">
+                    <p>⚠️ Ensure you are in a quiet, distraction-free environment</p>
+                </div>
+            </div>
+            <div class="start-section">
+                <p>Press the <b>SPACEBAR</b> or click below to begin.</p>
+                <button id="beginBtn" class="start-btn">Begin Practice Round</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🟣 Main Arena Container -->
+    <div id="arenaContainer" class="screen">
+        <div id="arena" class="arena-circle">
+            <div id="arenaText" class="arena-instructions">
+                <p>Click and drag images into the circular arena</p>
+                <p class="small-text">(Double-click for smoother interaction on MacBook/desktop)</p>
+            </div>
+        </div>
+        <div id="warningMessage" class="warning-message">
+            ⚠ Please move all images inside the arena before continuing
+        </div>
+        <div id="timerDisplay" class="timer">
+            Total Time: <span id="totalTime">0</span>s
+        </div>
+    </div>
+
+    <!-- 🟡 Attention and Device Questions -->
+    <div id="questions" class="screen">
+        <div class="question-container">
+            <div id="q1" class="question">
+                <h2>Attention Check</h2>
+                <p>Did you pay full attention during the task? (Be honest)</p>
+                <div class="button-group">
+                    <button onclick="recordAnswer('attention','Yes')">Yes</button>
+                    <button onclick="recordAnswer('attention','No')">No</button>
+                </div>
+            </div>
+            <div id="q2" class="question" style="display:none;">
+                <h2>Device Consistency</h2>
+                <p>Are you using the same device as the first time?</p>
+                <div class="button-group">
+                    <button onclick="recordAnswer('device','Yes')">Yes</button>
+                    <button onclick="recordAnswer('device','No')">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💤 Groningen Sleep Quality Scale (GSQS) -->
+    <div id="gsqsScreen" class="screen">
+        <div class="content">
+            <h2>Groningen Sleep Quality Scale (GSQS)</h2>
+            <p class="subtext">Please answer each statement below with Yes or No</p>
+
+            <form id="gsqsForm">
+                <!-- Your existing GSQS questions remain the same -->
+                <button type="button" class="submit-btn" onclick="submitGSQS()">Submit Responses</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🔵 End Screen -->
+    <div id="endScreen" class="screen">
+        <div class="content">
+            <h2>Thank You!</h2>
+            <p>Your responses have been recorded and downloaded.</p>
+            <p class="thank-you-note">
+                We sincerely appreciate your participation. Your contribution helps advance our research 
+                on conceptual arrangement and cognitive processing.
+            </p>
+            <div class="completion-details">
+                <p>Total Task Time: <span id="finalTime"></span></p>
+                <p>Data Exported: CSV File</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
