@@ -34,6 +34,56 @@ const gsqsQuestions = [
   "15. I didn't get more than 5 hours' sleep last night"
 ];
 
+// Add this function before startTask()
+function checkFullScreen() {
+    if (!document.fullscreenElement) {
+        alert("Please enter full-screen mode before starting the task.");
+        return false;
+    }
+    return true;
+}
+
+// Modify startTask() to include full-screen check
+function startTask() {
+    if (!checkFullScreen()) return;
+    // Rest of the existing startTask() code
+}
+
+// Add these variables at the top
+let practiceRound = true;
+const practicePeriod = 30; // 30 seconds practice time
+
+function startPracticeRound() {
+    instructions.style.display = "none";
+    arenaContainer.style.display = "block";
+    
+    // Load only one random image for practice
+    const randomImage = imageFiles[Math.floor(Math.random() * imageFiles.length)];
+    const img = document.createElement("img");
+    img.src = imageFolder + randomImage;
+    img.alt = randomImage;
+    img.classList.add("image");
+    
+    const x = window.innerWidth / 2 - 30;
+    const y = window.innerHeight / 2 - 30;
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
+    arenaContainer.appendChild(img);
+    
+    enableDragging();
+    startTimer();
+    arenaVisible = true;
+    
+    // Set a timeout for practice period
+    setTimeout(() => {
+        practiceRound = false;
+        clearInterval(timerInterval);
+        // Clear practice image and reset for main task
+        arenaContainer.innerHTML = '';
+        startTask();
+    }, practicePeriod * 1000);
+}
+
 // Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
@@ -92,13 +142,16 @@ function enableDragging() {
 }
 
 // --- Timer ---
+let arrangementStartTime, arrangementSeconds = 0;
+
 function startTimer() {
-  startTime = new Date();
-  timerInterval = setInterval(() => {
-    totalSeconds = Math.floor((new Date() - startTime) / 1000);
-    totalTimeDisplay.textContent = totalSeconds;
-  }, 1000);
+    arrangementStartTime = new Date();
+    timerInterval = setInterval(() => {
+        arrangementSeconds = Math.floor((new Date() - arrangementStartTime) / 1000);
+        totalTimeDisplay.textContent = arrangementSeconds;
+    }, 1000);
 }
+
 
 // --- Check inside arena ---
 function isInsideArena(img) {
@@ -137,7 +190,7 @@ function saveCSV() {
   let csv = "ParticipantID,Time,Attention,Device,GSQSScore,Image,X,Y\n";
   for (let key in positions) {
     const p = positions[key];
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
+    csv += `${participantID},${arrangementSeconds},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
   }
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
