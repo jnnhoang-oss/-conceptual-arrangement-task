@@ -45,7 +45,7 @@ const imageFiles = [
   "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
   "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
   "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
 // --- Load and display images ---
@@ -100,13 +100,7 @@ function startTimer() {
   }, 1000);
 }
 
-// --- Check inside arena ---
-function isInsideArena(img) {
-  const arenaRect = arena.getBoundingClientRect();
-  const centerX = arenaRect.left + arenaRect.width / 2;
-  const centerY = arenaRect.top + arenaRect.height / 2;
-  const radius = arenaRect.width / 2;
-  const imgRect = img.getBoundingClientRect();
+// --- gClientRect();
   const imgCenterX = imgRect.left + imgRect.width / 2;
   const imgCenterY = imgRect.top + imgRect.height / 2;
   const dx = imgCenterX - centerX;
