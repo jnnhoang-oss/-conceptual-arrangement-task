@@ -8,18 +8,14 @@ const warningMessage = document.getElementById("warningMessage");
 
 let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
-let fullscreenAnswer = "";
-let attentionAnswer = "";
-let deviceAnswer = "";
+let attentionAnswer = "", deviceAnswer = "";
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
-let isPractice = true; // NEW
 let gsqsAnswers = [];
 let currentGsqsIndex = 0;
 let gsqsScore = 0;
 
-// ---------------- GSQS ITEMS ----------------
 const gsqsQuestions = [
   "1. I had a deep sleep last night",
   "2. I feel that I slept poorly last night",
@@ -38,7 +34,7 @@ const gsqsQuestions = [
   "15. I didn't get more than 5 hours' sleep last night"
 ];
 
-// ---------------- IMAGES ----------------
+// Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
@@ -52,41 +48,25 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-// ---------------- LOAD IMAGES ----------------
-function loadImages(practice = false) {
-  arenaContainer.innerHTML = ""; // clear previous
-
-  if (practice) {
-    const img = document.createElement("img");
-    img.src = imageFolder + "mouse.jpg"; // practice image
-    img.classList.add("image");
-    img.style.left = "200px";
-    img.style.top = "200px";
-    arenaContainer.appendChild(img);
-    return;
-  }
-
+// --- Load and display images ---
+function loadImages() {
   imageFiles.forEach(file => {
     const img = document.createElement("img");
     img.src = imageFolder + file;
     img.alt = file;
     img.classList.add("image");
-
     const x = Math.random() * (window.innerWidth * 0.4 - 60);
     const y = Math.random() * (window.innerHeight - 80);
     img.style.left = `${x}px`;
     img.style.top = `${y}px`;
-
     arenaContainer.appendChild(img);
   });
 }
 
-// ---------------- DRAGGING (SIMPLE CLICK & DRAG ONLY) ----------------
+// --- Dragging ---
 let active = null, offsetX = 0, offsetY = 0;
-
 function enableDragging() {
   const imgs = document.querySelectorAll(".image");
-
   imgs.forEach(img => {
     img.addEventListener("mousedown", e => {
       active = e.target;
@@ -94,7 +74,6 @@ function enableDragging() {
       offsetY = e.offsetY;
     });
   });
-
   document.addEventListener("mousemove", e => {
     if (!active) return;
     const x = e.pageX - offsetX;
@@ -102,7 +81,6 @@ function enableDragging() {
     active.style.left = `${x}px`;
     active.style.top = `${y}px`;
   });
-
   document.addEventListener("mouseup", () => {
     if (active) {
       const rect = active.getBoundingClientRect();
@@ -113,7 +91,7 @@ function enableDragging() {
   });
 }
 
-// ---------------- TIMER ----------------
+// --- Timer ---
 function startTimer() {
   startTime = new Date();
   timerInterval = setInterval(() => {
@@ -122,52 +100,39 @@ function startTimer() {
   }, 1000);
 }
 
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
-// ---------------- ARENA CHECK ----------------
-function isInsideArena(img) {
-  const imgRect = img.getBoundingClientRect();
-  const arenaRect = arena.getBoundingClientRect();
-
-  return (
-    imgRect.left >= arenaRect.left &&
-    imgRect.right <= arenaRect.right &&
-    imgRect.top >= arenaRect.top &&
-    imgRect.bottom <= arenaRect.bottom
-  );
+// --- gClientRect();
+  const imgCenterX = imgRect.left + imgRect.width / 2;
+  const imgCenterY = imgRect.top + imgRect.height / 2;
+  const dx = imgCenterX - centerX;
+  const dy = imgCenterY - centerY;
+  return Math.sqrt(dx * dx + dy * dy) + imgRect.width / 2 < radius;
 }
 
 function allImagesInside() {
   return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
 }
 
-// ---------------- SCORE CALC ----------------
+// --- Calculate GSQS Score ---
 function calculateGsqsScore() {
   gsqsScore = 0;
-
-  for (let i = 1; i < gsqsAnswers.length; i++) {
-    const qNum = i + 1;
+  for (let i = 1; i < gsqsAnswers.length; i++) { // Skip question 1 (index 0)
+    const qNum = i + 1; // Questions 2 to 15
     const answer = gsqsAnswers[i];
-
-    if ([2,3,4,5,6,7,9,11,13,14,15].includes(qNum)) {
+    if ([2, 3, 4, 5, 6, 7, 9, 11, 13, 14, 15].includes(qNum)) {
       if (answer === "Yes") gsqsScore++;
-    } else {
+    } else { // Questions 8, 10, 12
       if (answer === "No") gsqsScore++;
     }
   }
 }
 
-// ---------------- SAVE CSV ----------------
+// --- Save CSV ---
 function saveCSV() {
-  let csv = "ParticipantID,Time,Fullscreen,Attention,Device,GSQSScore,Image,X,Y\n";
-
+  let csv = "ParticipantID,Time,Attention,Device,GSQSScore,Image,X,Y\n";
   for (let key in positions) {
     const p = positions[key];
-    csv += `${participantID},${totalSeconds},${fullscreenAnswer},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
+    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${gsqsScore},${key},${p.x},${p.y}\n`;
   }
-
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -175,70 +140,40 @@ function saveCSV() {
   a.click();
 }
 
-// ---------------- FLOW CONTROL ----------------
-document.getElementById("beginBtn").addEventListener("click", () => showFullscreenQuestion());
+// --- Flow control ---
+document.getElementById("beginBtn").addEventListener("click", startTask);
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && !arenaVisible) startTask();
+  else if (e.code === "Enter" && arenaVisible) endTask();
+});
 
-function showFullscreenQuestion() {
+function startTask() {
   instructions.style.display = "none";
-  document.getElementById("q0").style.display = "block";
-}
-
-// ---------------- START PRACTICE ----------------
-function startPractice() {
-  document.getElementById("q0").style.display = "none";
   arenaContainer.style.display = "block";
-  loadImages(true);
+  loadImages();
   enableDragging();
   startTimer();
   arenaVisible = true;
 }
 
-// ---------------- START MAIN TASK ----------------
-function startMainTask() {
-  isPractice = false;
-  positions = {}; // reset
-  totalSeconds = 0;
-
-  startTimer();
-  loadImages(false);
-  enableDragging();
-}
-
-// ---------------- END TASK (PRACTICE OR MAIN) ----------------
 function endTask() {
   const imgs = document.querySelectorAll(".image");
-
   imgs.forEach(img => {
     const rect = img.getBoundingClientRect();
     const key = img.src.split("/").pop();
     positions[key] = { x: rect.left, y: rect.top };
   });
-
-  if (!allImagesInside()) {
-    warningMessage.style.display = "block";
-    return;
-  }
-
-  warningMessage.style.display = "none";
-  arenaContainer.style.display = "none";
-  stopTimer();
-
-  if (isPractice) {
-    // Move to FULL instructions after practice
-    document.getElementById("practiceComplete").style.display = "flex";
-  } else {
-    // Real task completed → questions
+  if (allImagesInside()) {
+    warningMessage.style.display = "none";
+    arenaContainer.style.display = "none";
+    clearInterval(timerInterval);
     questions.style.display = "flex";
+  } else {
+    warningMessage.style.display = "block";
   }
 }
 
-// ---------------- QUESTION LOGIC ----------------
-function recordFullscreen(answer) {
-  fullscreenAnswer = answer;
-  document.getElementById("q0").style.display = "none";
-  startPractice();
-}
-
+// --- Question logic ---
 function recordAnswer(type, answer) {
   if (type === "attention") {
     attentionAnswer = answer;
@@ -261,16 +196,15 @@ function showGsqsQuestion() {
     saveCSV();
     return;
   }
-
   const q = gsqsQuestions[currentGsqsIndex];
-
   questions.innerHTML = `
-    <div id="gsqs_q">
+    <div id="gsqs_q" style="display:block;">
       <p>${q}</p>
       <button onclick="recordGsqs('Yes')">Yes</button>
       <button onclick="recordGsqs('No')">No</button>
     </div>
   `;
+  questions.style.display = "flex";
 }
 
 function recordGsqs(answer) {
