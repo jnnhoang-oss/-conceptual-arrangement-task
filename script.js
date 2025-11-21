@@ -179,16 +179,6 @@ function saveCSV() {
   a.click();
 }
 
-// --- Flow control ---
-document.getElementById("beginBtn").addEventListener("click", showscreenQuestion);
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) {
-    if (instructions.style.display !== "none") {
-      showscreenQuestion();
-    }
-  }
-  else if (e.code === "Enter" && arenaVisible) endTask();
-});
 
 //show question before arrangement
 function showscreenQuestion() {
