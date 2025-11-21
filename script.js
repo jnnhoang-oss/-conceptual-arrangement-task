@@ -2,6 +2,7 @@ const arenaContainer = document.getElementById("arenaContainer");
 const arena = document.getElementById("arena");
 const instructions = document.getElementById("instructions");
 const fullscreen = document.getElementById("fullscreen");
+const pracInstructions = document.getElementById("pracInstructions");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
