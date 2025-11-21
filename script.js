@@ -143,18 +143,33 @@ function allImagesInside() {
 
 // --- Save CSV ---
 function saveCSV() {
-  let csv = "ParticipantID,Time,Attention,Device,Image,X,Y";
-
-  // Add GSQS columns
+  const createdAt = new Date().toLocaleString("en-US", {
+  timeZone: "America/New_York"
+  });
+  let csv = `created_at,${createdAt}\n`;
+  csv += "ParticipantID,Time,Fullscreen,Attention,Device,Image,X,Y";
+  // Add GSQS columns (as strings: Yes/No)
   for (let i = 1; i <= 15; i++) csv += `,GSQS_Q${i}`;
-  csv += "\n";
+  csv += ",GSQS_Total\n";
+
+  // Calculate GSQS total (count "Yes" answers)
+  let gsqsTotal = 0;
+  for (let i = 1; i <= 15; i++) {
+    if (sleepAnswers[i] === "Yes") gsqsTotal++;
+  }
 
   // Add each image position
   for (let key in positions) {
     const p = positions[key];
-    csv += `${participantID},${totalSeconds},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}`;
-    for (let i = 1; i <= 15; i++) csv += `,${sleepAnswers[i] || ""}`;
-    csv += "\n";
+    csv += `${participantID},${totalSeconds},${fullscreenAnswer},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}`;
+    
+    // Add GSQS answers as strings (Yes/No)
+    for (let i = 1; i <= 15; i++) {
+      csv += `,${sleepAnswers[i] || ""}`;
+    }
+    
+    // Add GSQS total score
+    csv += `,${gsqsTotal}\n`;
   }
 
   const blob = new Blob([csv], { type: "text/csv" });
@@ -165,34 +180,78 @@ function saveCSV() {
 }
 
 // --- Flow control ---
-document.getElementById("beginBtn").addEventListener("click", startTask);
+document.getElementById("beginBtn").addEventListener("click", showscreenQuestion);
 document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) startTask();
+  if (e.code === "Space" && !arenaVisible) {
+    if (instructions.style.display !== "none") {
+      showscreenQuestion();
+    }
+  }
   else if (e.code === "Enter" && arenaVisible) endTask();
 });
 
-function startTask() {
+//show question before arrangement
+function showscreenQuestion() {
+  instructions.classList.remove("visible");
   instructions.style.display = "none";
+  screenQuestion.classList.add("visible");
+  screenQuestion.style.display = "flex";
+}
+
+//record screen question
+function recordFullscreenAnswer(answer) {
+  fullscreenAnswer = answer;
+  screenQuestion.classList.remove("visible");
+  screenQuestion.style.display = "none";
+  pracInstructions.classList.add("visible");
+  pracInstructions.style.display = "flex";
+}
+
+//start prac
+function beginPractice() {
+  pracInstructions.classList.remove("visible");
+  pracInstructions.style.display = "none";
+  isPrac = true;
+  startTask();
+}
+
+//start actual
+function startTask() {
+  arenaContainer.classList.add("visible");
   arenaContainer.style.display = "block";
-  loadImages();
-  enableDragging();
+  loadImages();   
   startTimer();
   arenaVisible = true;
 }
 
 function endTask() {
   const imgs = document.querySelectorAll(".image");
-  imgs.forEach(img => {
-    const rect = img.getBoundingClientRect();
-    const key = img.src.split("/").pop();
-    positions[key] = { x: rect.left, y: rect.top };
-  });
+  
+  if (!isPrac) {
+    imgs.forEach(img => {
+      const rect = img.getBoundingClientRect();
+      const key = img.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+    });
+  }
 
   if (allImagesInside()) {
     warningMessage.style.display = "none";
-    arenaContainer.style.display = "none";
-    clearInterval(timerInterval);
-    questions.style.display = "flex";
+    arenaVisible = false;
+    
+    if (isPrac) {
+      clearInterval(timerInterval);
+      isPrac = false;
+      
+      alert("Practice complete! Press OK to begin the actual arrangement task.");
+      startTask(); 
+    } else {
+      arenaContainer.classList.remove("visible");
+      arenaContainer.style.display = "none";
+      clearInterval(timerInterval);
+      questions.classList.add("visible");
+      questions.style.display = "flex";
+    }
   } else {
     warningMessage.style.display = "block";
   }
@@ -262,7 +321,7 @@ function showSleepQuestionnaire() {
     } else {
       questions.style.display = "none";
       endScreen.style.display = "flex";
-      saveCSV(); // ✅ Save everything together
+      saveCSV();
     }
   }
 }
