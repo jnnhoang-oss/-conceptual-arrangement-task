@@ -36,6 +36,31 @@ const pracImage = [
   "https://via.placeholder.com/80?text=Wolf",
   "https://via.placeholder.com/80?text=Husky",
   "https://via.placeholder.com/80?text=Dog",
+];
+
+let dragging = null
+
+//----Practice----
+function loadImages() {
+  const imagesToLoad = isPrac ? pracImage : imageFiles;
+  
+  //clear pracImage
+  const oldImages = document.querySelectorAll(".image");
+  oldImages.forEach(img => img.remove());
+  
+  imagesToLoad.forEach(file => {
+    const img = document.createElement("img");
+    img.src = imageFolder + file;
+    img.alt = file;
+    img.classList.add("image");
+
+    const x = Math.random() * (window.innerWidth * 0.4 - 60);
+    const y = Math.random() * (window.innerHeight - 80);
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
+
+    arenaContainer.appendChild(img);
+  });
 
 // --- Load and display images ---
 function loadImages() {
@@ -85,6 +110,8 @@ function enableDragging() {
     }
   });
 }
+
+
 
 // --- Timer ---
 function startTimer() {
