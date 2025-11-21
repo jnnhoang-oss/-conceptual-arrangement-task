@@ -45,19 +45,18 @@ function loadImages() {
   const imagesToLoad = isPrac ? pracImage : imageFiles;
   
   //clear pracImage
-  const oldImages = document.querySelectorAll(".image");
-  oldImages.forEach(img => img.remove());
-  
-  imagesToLoad.forEach(file => {
-    const img = document.createElement("img");
-    img.src = imageFolder + file;
-    img.alt = file;
-    img.classList.add("image");
+     const img = document.createElement("img");
+    img.src = src;
+    img.className = "stimuli";
+    img.style.position = "relative";
+    img.style.margin = "5px";
+    img.dataset.id = i;
+    img.draggable = true;
 
-    const x = Math.random() * (window.innerWidth * 0.4 - 60);
-    const y = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
+    img.addEventListener("dragstart", (e) => {
+      dragging = img;
+      e.dataTransfer.setData("text/plain", img.dataset.id);
+    });
 
     arenaContainer.appendChild(img);
   });
