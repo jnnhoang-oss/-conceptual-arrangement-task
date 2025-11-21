@@ -54,7 +54,7 @@ html, body {
   margin-bottom: 10px;
 }
 
-#beginBtn {
+#continueBtn {
   margin-top: 25px;
   padding: 10px 25px;
   font-size: 18px;
@@ -66,8 +66,54 @@ html, body {
   transition: background 0.3s ease;
 }
 
-#beginBtn:hover {
+#continueBtn:hover {
   background: #005fd1;
+}
+
+#instructions {
+    background-color: #eaf3ff;
+}
+
+#instructions h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+#instructions p {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#beginBtn {
+    margin-top: 25px;
+    padding: 10px 25px;
+    font-size: 18px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#continueBtn: hover {
+    background: var(--dark-blue);
+}
+
+#beginBtn {
+    margin-top: 25px;
+    padding: 12px 28px;
+    font-size: 18px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#beginBtn: hover {
+    background: var(--dark-blue);
 }
 
 /* 🟣 Arena Section */
