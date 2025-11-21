@@ -244,19 +244,6 @@ html, body {
     line-height: 1.5;
 }
 
-/* 5. ANIMATIONS & TRANSITIONS */
-@keyframes subtleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-#warningMessage {
-    animation: subtleFloat 1.5s infinite;
-}
-
-.screen, .image, button {
-    transition: all 0.3s ease-in-out;
-}
 
 /* 6. ACCESSIBILITY & FOCUS STATES */
 button:focus {
