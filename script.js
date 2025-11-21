@@ -32,6 +32,11 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
 ];
 
+const pracImage = [
+  "https://via.placeholder.com/80?text=Wolf",
+  "https://via.placeholder.com/80?text=Husky",
+  "https://via.placeholder.com/80?text=Dog",
+
 // --- Load and display images ---
 function loadImages() {
   imageFiles.forEach(file => {
