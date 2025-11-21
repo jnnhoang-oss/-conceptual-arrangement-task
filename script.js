@@ -11,10 +11,12 @@ const warningMessage = document.getElementById("warningMessage");
 let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
 let attentionAnswer = "", deviceAnswer = "";
+let fullscreenAnswer = "";
 let sleepAnswers = {};
 let positions = {};
 let totalSeconds = 0;
 let arenaVisible = false;
+let isPrac = false;
 
 // Your image folder
 const imageFolder = ".github/wth/";
