@@ -197,11 +197,14 @@ function beginPractice() {
 
 //start actual
 function startTask() {
-  arenaContainer.classList.add("visible");
-  arenaContainer.style.display = "block";
-  loadImages();   
-  startTimer();
-  arenaVisible = true;
+    arenaContainer.classList.add("visible");
+    arenaContainer.style.display = "block";
+
+    positions = {};  
+
+    loadImages();
+    startTimer();
+    arenaVisible = true;
 }
 
 function endTask() {
