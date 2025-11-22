@@ -1,12 +1,12 @@
 const arenaContainer = document.getElementById("arenaContainer");
 const arena = document.getElementById("arena");
 const instructions = document.getElementById("instructions");
-const fullscreen = document.getElementById("fullscreen");
-const pracInstructions = document.getElementById("pracInstructions");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
 const totalTimeDisplay = document.getElementById("totalTime");
 const warningMessage = document.getElementById("warningMessage");
+const screenQuestion = document.getElementById("screenQuestion");
+const pracInstructions = document.getElementById("pracInstructions");
 
 let participantID = prompt("Enter Participant ID:") || "P1";
 let startTime, timerInterval;
@@ -18,7 +18,7 @@ let totalSeconds = 0;
 let arenaVisible = false;
 let isPrac = false;
 
-// image folder
+// Your image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
@@ -32,10 +32,79 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-const pracImage = ["herring.jpg","horse.jpg","hyena.jpg"];
+const pracImage = ["square.jpg","circle.jpg","oval.jpg"];
 
+// Dragging
+let active = null;
+let offsetX = 0, offsetY = 0;
+let targetX = 0, targetY = 0;
+let dragRafId = null; 
+let dragDocListenersBound = false;
 
-//----Practice image load----
+function enableDragging() {
+  const imgs = document.querySelectorAll(".image");
+
+  imgs.forEach(img => {
+    img.style.position = "absolute";
+    img.style.cursor = "grab";
+
+    img.addEventListener("mousedown", e => {
+      e.preventDefault();
+      active = e.currentTarget;
+
+      const rect = active.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      targetX = rect.left;
+      targetY = rect.top;
+
+      active.style.cursor = "grabbing";
+      active.style.zIndex = "1000";
+    });
+  });
+
+  if (!dragDocListenersBound) {
+    document.addEventListener("mousemove", e => {
+      if (!active) return;
+      e.preventDefault();
+
+      targetX = e.clientX - offsetX;
+      targetY = e.clientY - offsetY;
+
+      if (!dragRafId) {
+        dragRafId = requestAnimationFrame(updateDragPosition);
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      if (!active) return;
+
+      //only record actual round
+      if (!isPrac) {
+        const rect = active.getBoundingClientRect();
+        const key = active.src.split("/").pop();
+        positions[key] = { x: rect.left, y: rect.top };
+      }
+
+      active.style.cursor = "grab";
+      active.style.zIndex = "1";
+      active = null;
+    });
+
+    dragDocListenersBound = true;
+  }
+}
+
+function updateDragPosition() {
+  if (active) {
+    active.style.left = `${targetX}px`;
+    active.style.top = `${targetY}px`;
+  }
+  dragRafId = null;
+}
+
+// --- Load and display images ---
 function loadImages() {
   const imagesToLoad = isPrac ? pracImage : imageFiles;
   
@@ -56,49 +125,22 @@ function loadImages() {
 
     arenaContainer.appendChild(img);
   });
-enableDragging();
+
+  //add dragging after new image
+  enableDragging();
 }
 
-// --- Dragging ---
-let activeImg = null;
-let startX = 0, startY = 0;
-let initialLeft = 0, initialTop = 0;
-
-function enableDragging() {
-
-  const imgs = document.querySelectorAll(".image");
-
-  imgs.forEach(img => {
-    img.addEventListener("mousedown", e => {
-      activeImg = img;
-
-      const rect = img.getBoundingClientRect();
-      initialLeft = rect.left;
-      initialTop = rect.top;
-
-      startX = e.pageX;
-      startY = e.pageY;
-    });
-  });
-
-  document.addEventListener("mousemove", e => {
-    if (!activeImg) return;
-
-    const dx = e.pageX - startX;
-    const dy = e.pageY - startY;
-
-    activeImg.style.left = initialLeft + dx + "px";
-    activeImg.style.top = initialTop + dy + "px";
-  });
-
-  document.addEventListener("mouseup", () => {
-    if (activeImg) {
-      const rect = activeImg.getBoundingClientRect();
-      const key = activeImg.src.split("/").pop();
-      positions[key] = { x: rect.left, y: rect.top };
-      activeImg = null;
-    }
-  });
+// --- Timer ---
+function startTimer() {
+  // clear previous timer
+  if (timerInterval) clearInterval(timerInterval);
+  
+  startTime = new Date();
+  totalSeconds = 0;
+  timerInterval = setInterval(() => {
+    totalSeconds = Math.floor((new Date() - startTime) / 1000);
+    totalTimeDisplay.textContent = totalSeconds;
+  }, 1000);
 }
 
 // --- Check inside arena ---
