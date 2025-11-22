@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Conceptual Arrangement Task</title>
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conceptual Arrangement Task</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- 🟢 Instruction Screen -->
+  <!-- 🟢 Instruction Screen -->
   <div id="instructions" class="screen visible">
     <div class="content">
       <h2>Conceptual Arrangement Task</h2>
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <!-- practice -->
+  <!-- prac round -->
   <div id="pracInstructions" class="screen">
     <div class="content">
       <h1>Practice Round</h1>
@@ -48,161 +48,49 @@
       <p>Please drag <strong>the 3 images</strong> to the circle.</p>
       <p>Arrange them <strong>so more similar ones</strong> are placed closer.</p>
       <p>Press <strong>Enter</strong> when finished.</p>
-      <button id="Begin" onclick="begin()">Start practice</button>
+      <button id="beginBtn" onclick="beginPractice()">Start practice</button>
     </div>
   </div>
 
-
-<!-- 🟣 Main Arena Container -->
-<div id="arenaContainer" class="screen">
-  <div id="arena"></div>
-  <div id="arenaText">
-    <p>Click and drag images. Press ENTER when finished.</p>
-  <p>(Double click if using MacBook/desktop for smoother transaction)</p></div>
-  <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
-  <div id="timerDisplay">Total Time: <span id="totalTime">0</span>s</div>
-</div>
-
-<!-- 🟡 Questions -->
-<div id="questions" class="screen">
-  <div id="q1" class="question">
-    <h2>Did you pay attention (BE HONEST)?</h2>
-    <button onclick="recordAnswer('attention','Yes')">Yes</button>
-    <button onclick="recordAnswer('attention','No')">No</button>
+  <!-- 🟣 Main Arena Container -->
+  <div id="arenaContainer" class="screen">
+    <div id="arena"></div>
+    <div id="arenaText">
+      <p>Click and drag images. Arrange images, placing conceptually similar ones closer.</p>
+      <p>Both the distances within the clusters and between the clusters are significant.</p>
+      <p>Press ENTER when finished.</p>
+    </div>
+    <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
+    <div id="timerDisplay">Total Time: <span id="totalTime">0</span>s</div>
   </div>
-  <div id="q2" class="question" style="display:none;">
-    <h2>Are you using the same device as the first time?</h2>
-    <button onclick="recordAnswer('device','Yes')">Yes</button>
-    <button onclick="recordAnswer('device','No')">No</button>
+
+  <!-- 🟡 Questions -->
+  <div id="questions" class="screen">
+    <div id="q1" class="question">
+      <h2>Did you pay attention (BE HONEST)?</h2>
+      <button onclick="recordAnswer('attention','Yes')">Yes</button>
+      <button onclick="recordAnswer('attention','No')">No</button>
+    </div>
+
+    <div id="q2" class="question" style="display:none;">
+      <h2>Are you using the same device as the first time?</h2>
+      <button onclick="recordAnswer('device','Yes')">Yes</button>
+      <button onclick="recordAnswer('device','No')">No</button>
+    </div>
   </div>
-</div>
 
-<!-- 💤 Groningen Sleep Quality Scale (GSQS) -->
-<div id="gsqsScreen" class="screen">
-  <div class="content">
-    <h2>Groningen Sleep Quality Scale (GSQS)</h2>
-    <p>Please answer each statement below with Yes or No.</p>
-
-    <form id="gsqsForm">
-      <div class="question"><p>1. I had a deep sleep last night</p>
-        <label><input type="radio" name="q1" value="true" required> Yes</label>
-        <label><input type="radio" name="q1" value="false"> No</label>
-      </div>
-      <div class="question"><p>2. I feel that I slept poorly last night</p>
-        <label><input type="radio" name="q2" value="true" required> Yes</label>
-        <label><input type="radio" name="q2" value="false"> No</label>
-      </div>
-      <div class="question"><p>3. It took me more than half an hour to fall asleep last night</p>
-        <label><input type="radio" name="q3" value="true" required> Yes</label>
-        <label><input type="radio" name="q3" value="false"> No</label>
-      </div>
-      <div class="question"><p>4. I woke up several times last night</p>
-        <label><input type="radio" name="q4" value="true" required> Yes</label>
-        <label><input type="radio" name="q4" value="false"> No</label>
-      </div>
-      <div class="question"><p>5. I felt tired after waking up this morning</p>
-        <label><input type="radio" name="q5" value="true" required> Yes</label>
-        <label><input type="radio" name="q5" value="false"> No</label>
-      </div>
-      <div class="question"><p>6. I feel that I didn't get enough sleep last night</p>
-        <label><input type="radio" name="q6" value="true" required> Yes</label>
-        <label><input type="radio" name="q6" value="false"> No</label>
-      </div>
-      <div class="question"><p>7. I got up in the middle of the night</p>
-        <label><input type="radio" name="q7" value="true" required> Yes</label>
-        <label><input type="radio" name="q7" value="false"> No</label>
-      </div>
-      <div class="question"><p>8. I felt rested after waking up this morning</p>
-        <label><input type="radio" name="q8" value="true" required> Yes</label>
-        <label><input type="radio" name="q8" value="false"> No</label>
-      </div>
-      <div class="question"><p>9. I feel that I only had a couple of hours' sleep last night</p>
-        <label><input type="radio" name="q9" value="true" required> Yes</label>
-        <label><input type="radio" name="q9" value="false"> No</label>
-      </div>
-      <div class="question"><p>10. I feel that I slept well last night</p>
-        <label><input type="radio" name="q10" value="true" required> Yes</label>
-        <label><input type="radio" name="q10" value="false"> No</label>
-      </div>
-      <div class="question"><p>11. I didn't sleep a wink last night</p>
-        <label><input type="radio" name="q11" value="true" required> Yes</label>
-        <label><input type="radio" name="q11" value="false"> No</label>
-      </div>
-      <div class="question"><p>12. I didn't have trouble falling asleep last night</p>
-        <label><input type="radio" name="q12" value="true" required> Yes</label>
-        <label><input type="radio" name="q12" value="false"> No</label>
-      </div>
-      <div class="question"><p>13. After I woke up last night, I had trouble falling asleep again</p>
-        <label><input type="radio" name="q13" value="true" required> Yes</label>
-        <label><input type="radio" name="q13" value="false"> No</label>
-      </div>
-      <div class="question"><p>14. I tossed and turned all night last night</p>
-        <label><input type="radio" name="q14" value="true" required> Yes</label>
-        <label><input type="radio" name="q14" value="false"> No</label>
-      </div>
-      <div class="question"><p>15. I didn't get more than 5 hours' sleep last night</p>
-        <label><input type="radio" name="q15" value="true" required> Yes</label>
-        <label><input type="radio" name="q15" value="false"> No</label>
-      </div>
-      <button type="button" onclick="submitGSQS()">Submit</button>
-    </form>
+  <!-- 🔵 End Screen -->
+  <div id="endScreen" class="screen">
+    <div class="content">
+      <h2>Thank you for participating!</h2>
+      <p>Your responses have been recorded and downloaded as a CSV file.</p>
+      <p class="thank-you-note">
+        We sincerely appreciate your time and effort in completing this task.
+        Your participation helps advance our understanding of conceptual arrangements.
+      </p>
+    </div>
   </div>
-</div>
 
-<!-- 🔵 End Screen -->
-<div id="endScreen" class="screen">
-  <div class="content">
-    <h2>Thank you for participating!</h2>
-    <p>Your responses have been recorded and downloaded as a CSV file.</p>
-    <p class="thank-you-note">
-      We sincerely appreciate your time and effort in completing this task. Your participation helps advance our understanding of conceptual arrangements.
-    </p>
-  </div>
-</div>
-
-<script src="script.js"></script>
-
-<script>
-// 💤 GSQS Logic – integrates into same CSV saving system
-function submitGSQS() {
-  const form = document.getElementById('gsqsForm');
-  const data = new FormData(form);
-
-  const trueScores = [2,3,4,5,6,7,9,11,13,14,15];
-  const falseScores = [8,10,12];
-  let score = 0;
-
-  // Compute total GSQS score
-  for (let i = 2; i <= 15; i++) {
-    const ans = data.get('q' + i);
-    if (!ans) continue;
-    if (trueScores.includes(i) && ans === 'true') score++;
-    if (falseScores.includes(i) && ans === 'false') score++;
-  }
-
-  // Prepare row for CSV
-  const timestamp = new Date().toISOString();
-  const participantID = localStorage.getItem('participantID') || 'P' + Math.floor(Math.random() * 100000);
-  localStorage.setItem('participantID', participantID);
-
-  const row = {
-    timestamp,
-    participantID,
-    task: "GSQS",
-    score
-  };
-
-  // Save to same CSV file using existing function
-  if (typeof saveData === 'function') {
-    saveData(row);
-  } else {
-    console.warn("⚠️ No saveData() function found — connect to main script saving logic.");
-  }
-
-  // Hide GSQS, show end screen
-  document.getElementById('gsqsScreen').classList.remove('visible');
-  document.getElementById('endScreen').classList.add('visible');
-}
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
