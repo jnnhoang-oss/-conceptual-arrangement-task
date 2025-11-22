@@ -59,11 +59,10 @@ function loadImages() {
 enableDragging();
 }
 
-
 // --- Dragging ---
 let activeImg = null;
-let startX = 0, startY = 0;
-let initialX = 0, initialY = 0;
+let grabOffsetX = 0;
+let grabOffsetY = 0;
 
 function enableDragging() {
   const imgs = document.querySelectorAll(".image");
@@ -74,43 +73,42 @@ function enableDragging() {
       activeImg = img;
 
       const rect = img.getBoundingClientRect();
-      initialX = rect.left;
-      initialY = rect.top;
 
-      startX = e.pageX;
-      startY = e.pageY;
+      // ⭐ Correct offset: mouse position inside the image
+      grabOffsetX = e.clientX - rect.left;
+      grabOffsetY = e.clientY - rect.top;
 
-      img.style.transition = "none"; // remove smoothing during drag
+      img.style.transition = "none";
     });
   });
 
   document.addEventListener("mousemove", e => {
     if (!activeImg) return;
 
-    const dx = e.pageX - startX;
-    const dy = e.pageY - startY;
+    // New top-left coordinate based on *mouse position minus grab offset*
+    const newX = e.clientX - grabOffsetX;
+    const newY = e.clientY - grabOffsetY;
 
-    const newX = initialX + dx;
-    const newY = initialY + dy;
-
-    // GPU FAST TRANSFORM
+    // GPU accelerated movement
     activeImg.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
   });
 
   document.addEventListener("mouseup", () => {
-    if (activeImg) {
-      const rect = activeImg.getBoundingClientRect();
-      const key = activeImg.src.split("/").pop();
+    if (!activeImg) return;
 
-      positions[key] = { x: rect.left, y: rect.top };
+    const rect = activeImg.getBoundingClientRect();
+    const key = activeImg.src.split("/").pop();
 
-      activeImg.style.transition = ""; // restore hover animations
-      activeImg.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+    positions[key] = { x: rect.left, y: rect.top };
 
-      activeImg = null;
-    }
+    // Lock transform to the final position
+    activeImg.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+    activeImg.style.transition = "";
+
+    activeImg = null;
   });
 }
+
 // --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
