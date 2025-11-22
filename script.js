@@ -225,7 +225,8 @@ function endTask() {
       
       alert("Practice complete! Press OK to begin the actual arrangement task.");
       startTask(); 
-    } else {
+    } 
+    else {
       arenaContainer.classList.remove("visible");
       arenaContainer.style.display = "none";
       clearInterval(timerInterval);
