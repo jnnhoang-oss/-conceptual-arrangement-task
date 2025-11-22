@@ -32,7 +32,32 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-const pracImage = ["reindeer.jpg","salmon.jpg","shark.jpg"];
+// --- Create Practice Placeholder ---
+function createPracticePlaceholder() {
+  // remove existing placeholder if any
+  const oldPlaceholder = document.getElementById("pracPlaceholder");
+  if (oldPlaceholder) oldPlaceholder.remove();
+
+  if (!isPrac) return; // only show for practice
+
+  const arenaRect = arena.getBoundingClientRect();
+  const placeholder = document.createElement("div");
+  placeholder.id = "pracPlaceholder";
+
+  placeholder.style.position = "absolute";
+  placeholder.style.width = `${arenaRect.width}px`;
+  placeholder.style.height = `${arenaRect.height}px`;
+  placeholder.style.left = `${arenaRect.left}px`;
+  placeholder.style.top = `${arenaRect.top}px`;
+  placeholder.style.border = "3px dashed #00ffcc";
+  placeholder.style.borderRadius = "50%";
+  placeholder.style.pointerEvents = "none"; // so it doesn't block dragging
+  placeholder.style.zIndex = "500";
+  placeholder.style.opacity = "0.3";
+
+  document.body.appendChild(placeholder);
+}
+
 
 // Dragging
 let active = null;
@@ -108,7 +133,7 @@ function updateDragPosition() {
 function loadImages() {
   const imagesToLoad = isPrac ? pracImage : imageFiles;
   
-  //clear pracImage
+  // clear old images
   const oldImages = document.querySelectorAll(".image");
   oldImages.forEach(img => img.remove());
   
@@ -125,6 +150,12 @@ function loadImages() {
 
     arenaContainer.appendChild(img);
   });
+
+  enableDragging();
+
+  // add practice placeholder if in practice
+  createPracticePlaceholder();
+}
 
   //add dragging after new image
   enableDragging();
