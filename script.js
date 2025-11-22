@@ -220,12 +220,20 @@ function endTask() {
     arenaVisible = false;
     
     if (isPrac) {
-      clearInterval(timerInterval);
-      isPrac = false;
-      
-      alert("Practice complete! Press OK to begin the actual arrangement task.");
-      startTask(); 
-    } 
+    clearInterval(timerInterval);
+    isPrac = false;
+
+    // hide arena BEFORE loading main task
+    arenaContainer.style.display = "none";
+
+    alert("Practice complete! Press OK to begin the actual arrangement task.");
+
+    // slight delay prevents misaligned drag positions
+    setTimeout(() => {
+        startTask(); 
+    }, 100);
+    return;
+}
     else {
       arenaContainer.classList.remove("visible");
       arenaContainer.style.display = "none";
