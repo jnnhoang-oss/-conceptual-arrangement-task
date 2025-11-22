@@ -1,6 +1,5 @@
 /* 1. RESET & GLOBAL VARIABLES */
 :root {
-    /* Color Palette */
     --primary-blue: #0077ff;
     --dark-blue: #005fd1;
     --background-gray: #f5f5f5;
@@ -66,22 +65,7 @@ html, body {
     margin-bottom: 10px;
 }
 
-#beginBtn {
-    margin-top: 25px;
-    padding: 10px 25px;
-    font-size: 18px;
-    background: var(--primary-blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-#beginBtn:hover {
-    background: var(--dark-blue);
-}
-
+#beginBtn,
 #beginPracticeBtn {
     margin-top: 25px;
     padding: 12px 28px;
@@ -91,9 +75,10 @@ html, body {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.1s ease;
 }
 
+#beginBtn:hover,
 #beginPracticeBtn:hover {
     background: var(--dark-blue);
 }
@@ -144,16 +129,12 @@ html, body {
     color: var(--warning-red);
     font-weight: bold;
     display: none;
+    animation: subtleFloat 1.5s infinite;
 }
 
 /* 4.3 Image Styles */
 .image {
-  will-change: transform;
-  position: fixed;      /* better for transform movement */
-}
-
-.image {
-    position: absolute;
+    position: absolute; /* fixed removed for correct drag positions */
     width: 50px;
     height: 50px;
     object-fit: cover;
@@ -255,19 +236,11 @@ html, body {
     50% { transform: translateY(-5px); }
 }
 
-#warningMessage {
-    animation: subtleFloat 1.5s infinite;
-}
-
-.screen, .image, button {
+.screen, button {
     transition: all 0.3s ease-in-out;
 }
 
 /* 6. ACCESSIBILITY & FOCUS STATES */
-button:focus {
-    outline: none;
-}
-
 button:focus-visible {
     outline: 3px solid var(--primary-blue);
     outline-offset: 2px;
@@ -298,12 +271,8 @@ input:focus {
 }
 
 @media screen and (max-width: 768px) {
-    /* Mobile-specific adjustments */
     .screen { padding: 20px; }
-    .content {
-        padding: 25px;
-        max-width: 95%;
-    }
+    .content { padding: 25px; max-width: 95%; }
 
     #arena {
         width: 400px;
@@ -325,17 +294,11 @@ input:focus {
     }
 }
 
-/* 8. UTILITY & SPECIAL CASES */
+/* 8. PRINT & RTL */
 @media print {
     body * { visibility: hidden; }
     #endScreen, #endScreen * { visibility: visible; }
-    #endScreen {
-        position: absolute;
-        left: 0;
-        top: 0;
-    }
+    #endScreen { position: absolute; left: 0; top: 0; }
 }
 
-html[dir="rtl"] .screen {
-    direction: rtl;
-}
+html[dir="rtl"] .screen { direction: rtl; }
