@@ -1,8 +1,7 @@
-// --- Elements (ensure these IDs exist in your HTML) ---
 const arenaContainer = document.getElementById("arenaContainer");
 const arena = document.getElementById("arena");
 const instructions = document.getElementById("instructions");
-const screenQuestion = document.getElementById("screenQuestion"); // fixed: was missing
+const fullscreen = document.getElementById("fullscreen");
 const pracInstructions = document.getElementById("pracInstructions");
 const questions = document.getElementById("questions");
 const endScreen = document.getElementById("endScreen");
@@ -19,8 +18,8 @@ let totalSeconds = 0;
 let arenaVisible = false;
 let isPrac = false;
 
-// image folder and lists
-const imageFolder = ".github/wth;
+// image folder
+const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
   "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
@@ -35,112 +34,74 @@ const imageFiles = [
 
 const pracImage = ["herring.jpg","horse.jpg","hyena.jpg"];
 
-// ---------- Load images ----------
+
+//----Practice image load----
 function loadImages() {
   const imagesToLoad = isPrac ? pracImage : imageFiles;
-
-  // remove previous images
-  document.querySelectorAll(".image").forEach(img => img.remove());
-  positions = {}; // clear positions for the new round
-
-  imagesToLoad.forEach((file) => {
+  
+  //clear pracImage
+  const oldImages = document.querySelectorAll(".image");
+  oldImages.forEach(img => img.remove());
+  
+  imagesToLoad.forEach(file => {
     const img = document.createElement("img");
     img.src = imageFolder + file;
     img.alt = file;
-    img.className = "image";
+    img.classList.add("image");
 
-    // position using transform so we can use GPU-accelerated translations
-    const x = Math.round(Math.random() * (window.innerWidth * 0.4 - 60));
-    const y = Math.round(Math.random() * (window.innerHeight - 160)); // leave room for UI
-    img.style.position = "fixed";           // fixed so transforms correspond to viewport coords
-    img.style.left = "0px";                 // we'll use transform for final placement
-    img.style.top = "0px";
-    img.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    img.dataset.staticX = x; // store initial for debugging if needed
-    img.dataset.staticY = y;
+    const x = Math.random() * (window.innerWidth * 0.4 - 60);
+    const y = Math.random() * (window.innerHeight - 80);
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
 
-    document.body.appendChild(img); // append to body so it's above other layout
+    arenaContainer.appendChild(img);
   });
-
-  // enable pointer dragging on the newly created images
-  enableDragging();
+enableDragging();
 }
 
-// ---------- Fast & accurate dragging (pointer events) ----------
+// --- Dragging ---
 let activeImg = null;
-let grabOffsetX = 0;
-let grabOffsetY = 0;
+let startX = 0, startY = 0;
+let initialLeft = 0, initialTop = 0;
 
 function enableDragging() {
-  // Remove existing pointer handlers first to avoid duplicates
-  document.querySelectorAll(".image").forEach(img => {
-    img.onpointerdown = null;
-    img.onpointermove = null;
-    img.onpointerup = null;
-    img.onpointercancel = null;
-  });
 
-  // pointerdown on images
-  document.querySelectorAll(".image").forEach(img => {
-    img.addEventListener("pointerdown", (ev) => {
-      ev.preventDefault();
-      // bring to front
-      img.style.zIndex = 9999;
+  const imgs = document.querySelectorAll(".image");
 
+  imgs.forEach(img => {
+    img.addEventListener("mousedown", e => {
       activeImg = img;
+
       const rect = img.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
 
-      // compute offset between pointer and image top-left
-      grabOffsetX = ev.clientX - rect.left;
-      grabOffsetY = ev.clientY - rect.top;
-
-      // capture pointer so we receive moves outside the element
-      img.setPointerCapture(ev.pointerId);
-
-      // visual feedback
-      img.style.transition = "transform 0.05s linear";
-      img.style.transform += " scale(1.08)"; // slight pop (we'll overwrite transform next)
+      startX = e.pageX;
+      startY = e.pageY;
     });
   });
 
-  // pointermove on document
-  document.addEventListener("pointermove", (ev) => {
-    if (!activeImg) return;
-    ev.preventDefault();
-
-    // calculate new absolute top-left position
-    const newX = ev.clientX - grabOffsetX;
-    const newY = ev.clientY - grabOffsetY;
-
-    // set transform directly to absolute coordinates (position fixed => viewport coords)
-    activeImg.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
-  }, { passive: false });
-
-  // pointerup / pointercancel
-  document.addEventListener("pointerup", finishPointerDrag);
-  document.addEventListener("pointercancel", finishPointerDrag);
-
-  function finishPointerDrag(ev) {
+  document.addEventListener("mousemove", e => {
     if (!activeImg) return;
 
-    try { activeImg.releasePointerCapture && activeImg.releasePointerCapture(ev && ev.pointerId); } catch (e) { /* ignore */ }
+    const dx = e.pageX - startX;
+    const dy = e.pageY - startY;
 
-    // finalize position: get bounding rect as final coordinates
-    const rect = activeImg.getBoundingClientRect();
-    const key = activeImg.src.split("/").pop();
-    positions[key] = { x: Math.round(rect.left), y: Math.round(rect.top) };
+    activeImg.style.left = initialLeft + dx + "px";
+    activeImg.style.top = initialTop + dy + "px";
+  });
 
-    // reset visuals
-    activeImg.style.transition = "";
-    activeImg.style.zIndex = "";
-    // ensure transform matches final coords (sometimes transform has scale appended)
-    activeImg.style.transform = `translate3d(${positions[key].x}px, ${positions[key].y}px, 0)`;
-
-    activeImg = null;
-  }
+  document.addEventListener("mouseup", () => {
+    if (activeImg) {
+      const rect = activeImg.getBoundingClientRect();
+      const key = activeImg.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+      activeImg = null;
+    }
+  });
 }
 
-// ---------- Arena checks ----------
+// --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
   const centerX = arenaRect.left + arenaRect.width / 2;
@@ -157,45 +118,37 @@ function isInsideArena(img) {
 }
 
 function allImagesInside() {
-  // For practice we might require same rule; keep consistent
-  const imgs = document.querySelectorAll(".image");
-  if (imgs.length === 0) return false;
-  return Array.from(imgs).every(isInsideArena);
+  return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
 }
 
-// ---------- Timer ----------
-function startTimer() {
-  clearInterval(timerInterval);
-  startTime = Date.now();
-  totalSeconds = 0;
-  totalTimeDisplay.textContent = "0";
-  timerInterval = setInterval(() => {
-    totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-    totalTimeDisplay.textContent = totalSeconds;
-  }, 1000);
-}
-
-function stopTimer() {
-  clearInterval(timerInterval);
-}
-
-// ---------- CSV Saving ----------
+// --- Save CSV ---
 function saveCSV() {
-  const createdAt = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+  const createdAt = new Date().toLocaleString("en-US", {
+  timeZone: "America/New_York"
+  });
   let csv = `created_at,${createdAt}\n`;
   csv += "ParticipantID,Time,Fullscreen,Attention,Device,Image,X,Y";
+  // Add GSQS columns (as strings: Yes/No)
   for (let i = 1; i <= 15; i++) csv += `,GSQS_Q${i}`;
   csv += ",GSQS_Total\n";
 
-  // compute GSQS total according to your earlier logic (Yes count)
+  // Calculate GSQS total (count "Yes" answers)
   let gsqsTotal = 0;
-  for (let i = 1; i <= 15; i++) if (sleepAnswers[i] === "Yes") gsqsTotal++;
+  for (let i = 1; i <= 15; i++) {
+    if (sleepAnswers[i] === "Yes") gsqsTotal++;
+  }
 
-  // add one row per image
+  // Add each image position
   for (let key in positions) {
     const p = positions[key];
     csv += `${participantID},${totalSeconds},${fullscreenAnswer},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}`;
-    for (let i = 1; i <= 15; i++) csv += `,${sleepAnswers[i] || ""}`;
+    
+    // Add GSQS answers as strings (Yes/No)
+    for (let i = 1; i <= 15; i++) {
+      csv += `,${sleepAnswers[i] || ""}`;
+    }
+    
+    // Add GSQS total score
     csv += `,${gsqsTotal}\n`;
   }
 
@@ -203,21 +156,21 @@ function saveCSV() {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `arrangement_${participantID}.csv`;
-  document.body.appendChild(a);
   a.click();
-  a.remove();
 }
 
-// ---------- Flow control ----------
+// --- Flow control ---
 document.getElementById("beginBtn").addEventListener("click", showscreenQuestion);
 document.addEventListener("keydown", e => {
   if (e.code === "Space" && !arenaVisible) {
-    if (instructions.style.display !== "none") showscreenQuestion();
-  } else if (e.code === "Enter" && arenaVisible) {
-    endTask();
+    if (instructions.style.display !== "none") {
+      showscreenQuestion();
+    }
   }
+  else if (e.code === "Enter" && arenaVisible) endTask();
 });
 
+//show question before arrangement
 function showscreenQuestion() {
   instructions.classList.remove("visible");
   instructions.style.display = "none";
@@ -225,6 +178,7 @@ function showscreenQuestion() {
   screenQuestion.style.display = "flex";
 }
 
+//record screen question
 function recordFullscreenAnswer(answer) {
   fullscreenAnswer = answer;
   screenQuestion.classList.remove("visible");
@@ -233,71 +187,57 @@ function recordFullscreenAnswer(answer) {
   pracInstructions.style.display = "flex";
 }
 
+//start prac
 function beginPractice() {
-  // hide practice instructions
   pracInstructions.classList.remove("visible");
   pracInstructions.style.display = "none";
-
-  // enable practice mode and start after tiny delay to ensure layout settles
   isPrac = true;
-  setTimeout(() => startTask(), 100);
+  startTask();
 }
 
+//start actual
 function startTask() {
-  // show arena
   arenaContainer.classList.add("visible");
   arenaContainer.style.display = "block";
-
-  // clear any existing images & positions
-  document.querySelectorAll(".image").forEach(img => img.remove());
-  positions = {};
-
-  // load images (practice/main determined by isPrac)
-  loadImages();
-
-  // start timer
+  loadImages();   
   startTimer();
   arenaVisible = true;
 }
 
 function endTask() {
-  // gather final positions of images
-  document.querySelectorAll(".image").forEach(img => {
-    const rect = img.getBoundingClientRect();
-    const key = img.src.split("/").pop();
-    positions[key] = { x: Math.round(rect.left), y: Math.round(rect.top) };
-  });
+  const imgs = document.querySelectorAll(".image");
+  
+  if (!isPrac) {
+    imgs.forEach(img => {
+      const rect = img.getBoundingClientRect();
+      const key = img.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+    });
+  }
 
-  // require all inside
-  if (!allImagesInside()) {
+  if (allImagesInside()) {
+    warningMessage.style.display = "none";
+    arenaVisible = false;
+    
+    if (isPrac) {
+      clearInterval(timerInterval);
+      isPrac = false;
+      
+      alert("Practice complete! Press OK to begin the actual arrangement task.");
+      startTask(); 
+    } else {
+      arenaContainer.classList.remove("visible");
+      arenaContainer.style.display = "none";
+      clearInterval(timerInterval);
+      questions.classList.add("visible");
+      questions.style.display = "flex";
+    }
+  } else {
     warningMessage.style.display = "block";
-    return;
   }
-
-  // pass check
-  warningMessage.style.display = "none";
-  arenaVisible = false;
-  stopTimer();
-
-  if (isPrac) {
-    // practice end -> start main
-    isPrac = false;
-    // hide arena
-    arenaContainer.style.display = "none";
-    alert("Practice complete! Press OK to begin the actual arrangement task.");
-    // small delay to avoid first-drag offset bugs
-    setTimeout(() => startTask(), 120);
-    return;
-  }
-
-  // actual task end -> questions
-  arenaContainer.classList.remove("visible");
-  arenaContainer.style.display = "none";
-  questions.classList.add("visible");
-  questions.style.display = "flex";
 }
 
-// ---------- Questions logic ----------
+// --- Question logic ---
 function recordAnswer(type, answer) {
   if (type === "attention") {
     attentionAnswer = answer;
@@ -310,7 +250,7 @@ function recordAnswer(type, answer) {
   }
 }
 
-// ---------- GSQS questionnaire ----------
+// --- Groningen Sleep Questionnaire ---
 const gsqsQuestions = [
   "I had a deep sleep last night",
   "I feel that I slept poorly last night",
@@ -330,11 +270,9 @@ const gsqsQuestions = [
 ];
 
 function showSleepQuestionnaire() {
-  // clear questions container
   questions.innerHTML = "";
   let index = 0;
 
-  // create UI for first question
   const qDiv = document.createElement("div");
   qDiv.className = "question";
 
@@ -361,12 +299,9 @@ function showSleepQuestionnaire() {
     if (index < gsqsQuestions.length) {
       qText.textContent = gsqsQuestions[index];
     } else {
-      // finished all GSQS questions
       questions.style.display = "none";
       endScreen.style.display = "flex";
       saveCSV();
     }
   }
 }
-
-// ---------- End of script ----------
