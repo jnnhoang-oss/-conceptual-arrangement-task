@@ -18,7 +18,7 @@ let totalSeconds = 0;
 let arenaVisible = false;
 let isPrac = false;
 
-// Your image folder
+// image folder
 const imageFolder = ".github/wth/";
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
@@ -40,9 +40,9 @@ const pracImage = [
 
 let dragging = null
 
-//----Practice----
+//----Practice image load----
 function loadImages() {
-  const imagesToLoad = isPrac ? pracImage : imageFiles;
+  const imagesToLoad = pracImage[];
   
   //clear pracImage
      const img = document.createElement("img");
@@ -109,7 +109,6 @@ function enableDragging() {
     }
   });
 }
-
 
 
 // --- Timer ---
