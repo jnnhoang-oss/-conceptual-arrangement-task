@@ -20,7 +20,7 @@ let arenaVisible = false;
 let isPrac = false;
 
 // image folder and lists
-const imageFolder = ".github/wth/";
+const imageFolder = ".github/wth/;
 const imageFiles = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
   "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
