@@ -34,6 +34,8 @@ const imageFiles = [
 
 const pracImage = ["herring.jpg","horse.jpg","hyena.jpg"];
 
+let dragging = null;
+
 //----Practice image load----
 function loadImages() {
   const imagesToLoad = isPrac ? pracImage : imageFiles;
@@ -47,6 +49,8 @@ function loadImages() {
     img.src = imageFolder + file;
     img.alt = file;
     img.classList.add("image");
+    img.dataset.id = i;
+    img.draggable = true;
 
     const x = Math.random() * (window.innerWidth * 0.4 - 60);
     const y = Math.random() * (window.innerHeight - 80);
@@ -67,6 +71,14 @@ function loadImages() {
     img.src = imageFolder + file;
     img.alt = file;
     img.classList.add("image");
+    
+    img.addEventListener("dragstart", (e) => {
+      dragging = img;
+      e.dataTransfer.setData("text/plain", img.dataset.id);
+    });
+
+    pool.appendChild(img);
+  });
 
     const x = Math.random() * (window.innerWidth * 0.4 - 60);
     const y = Math.random() * (window.innerHeight - 80);
@@ -80,35 +92,25 @@ function loadImages() {
 // --- Dragging ---
 let active = null, offsetX = 0, offsetY = 0;
 
-function enableDragging() {
-  const imgs = document.querySelectorAll(".image");
+arena.addEventListener("dragover", (e) => {
+  e.preventDefault();
+});
 
-  imgs.forEach(img => {
-    img.addEventListener("mousedown", e => {
-      active = e.target;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
-    });
-  });
+arena.addEventListener("drop", (e) => {
+  e.preventDefault();
+  if (!dragging) return;
 
-  document.addEventListener("mousemove", e => {
-    if (!active) return;
-    const x = e.pageX - offsetX;
-    const y = e.pageY - offsetY;
-    active.style.left = `${x}px`;
-    active.style.top = `${y}px`;
-  });
+  const rect = arena.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-  document.addEventListener("mouseup", () => {
-    if (active) {
-      const rect = active.getBoundingClientRect();
-      const key = active.src.split("/").pop();
-      positions[key] = { x: rect.left, y: rect.top };
-      active = null;
-    }
-  });
-}
+  dragging.style.position = "absolute";
+  dragging.style.left = (x - dragging.width/2) + "px";
+  dragging.style.top = (y - dragging.height/2) + "px";
 
+  arena.appendChild(dragging);
+  saveBtn.style.display = "block";
+});
 
 // --- Timer ---
 function startTimer() {
