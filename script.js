@@ -66,25 +66,34 @@ function loadImages() {
 // --- Dragging ---
 let active = null, offsetX = 0, offsetY = 0;
 
-arena.addEventListener("dragover", (e) => {
-  e.preventDefault();
-});
+function enableDragging() {
+  const imgs = document.querySelectorAll(".image");
 
-arena.addEventListener("drop", (e) => {
-  e.preventDefault();
-  if (!dragging) return;
+  imgs.forEach(img => {
+    img.addEventListener("mousedown", e => {
+      active = e.target;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
+    });
+  });
 
-  const rect = arena.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  document.addEventListener("mousemove", e => {
+    if (!active) return;
+    const x = e.pageX - offsetX;
+    const y = e.pageY - offsetY;
+    active.style.left = `${x}px`;
+    active.style.top = `${y}px`;
+  });
 
-  dragging.style.position = "absolute";
-  dragging.style.left = (x - dragging.width/2) + "px";
-  dragging.style.top = (y - dragging.height/2) + "px";
-
-  arena.appendChild(dragging);
-  saveBtn.style.display = "block";
-});
+  document.addEventListener("mouseup", () => {
+    if (active) {
+      const rect = active.getBoundingClientRect();
+      const key = active.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+      active = null;
+    }
+  });
+}
 
 // --- Timer ---
 function startTimer() {
