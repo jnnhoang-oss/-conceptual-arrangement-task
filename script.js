@@ -34,7 +34,6 @@ const imageFiles = [
 
 const pracImage = ["herring.jpg","horse.jpg","hyena.jpg"];
 
-let dragging = null;
 
 //----Practice image load----
 function loadImages() {
@@ -58,52 +57,50 @@ function loadImages() {
     arenaContainer.appendChild(img);
   });
 
-  //add dragging after new image
-  enableDragging();
 }
 
 
 // --- Dragging ---
-let active = null, offsetX = 0, offsetY = 0;
+let activeImg = null;
+let startX = 0, startY = 0;
+let initialLeft = 0, initialTop = 0;
 
 function enableDragging() {
+
   const imgs = document.querySelectorAll(".image");
 
   imgs.forEach(img => {
     img.addEventListener("mousedown", e => {
-      active = e.target;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
+      activeImg = img;
+
+      const rect = img.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
+
+      startX = e.pageX;
+      startY = e.pageY;
     });
   });
 
   document.addEventListener("mousemove", e => {
-    if (!active) return;
-    const x = e.pageX - offsetX;
-    const y = e.pageY - offsetY;
-    active.style.left = `${x}px`;
-    active.style.top = `${y}px`;
+    if (!activeImg) return;
+
+    const dx = e.pageX - startX;
+    const dy = e.pageY - startY;
+
+    activeImg.style.left = initialLeft + dx + "px";
+    activeImg.style.top = initialTop + dy + "px";
   });
 
   document.addEventListener("mouseup", () => {
-    if (active) {
-      const rect = active.getBoundingClientRect();
-      const key = active.src.split("/").pop();
+    if (activeImg) {
+      const rect = activeImg.getBoundingClientRect();
+      const key = activeImg.src.split("/").pop();
       positions[key] = { x: rect.left, y: rect.top };
-      active = null;
+      activeImg = null;
     }
   });
 }
-
-// --- Timer ---
-function startTimer() {
-  startTime = new Date();
-  timerInterval = setInterval(() => {
-    totalSeconds = Math.floor((new Date() - startTime) / 1000);
-    totalTimeDisplay.textContent = totalSeconds;
-  }, 1000);
-}
-
 // --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
