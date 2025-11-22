@@ -68,19 +68,24 @@ function enableDragging() {
   const imgs = document.querySelectorAll(".image");
 
   imgs.forEach(img => {
+    img.style.position = "absolute";
+    img.style.cursor = "grab";
+
     img.addEventListener("mousedown", e => {
-      active = e.target;
-      offsetX = e.offsetX;
-      offsetY = e.offsetY;
+      e.preventDefault();
+      active = e.currentTarget;
+
+      const rect = active.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+
+      targetX = rect.left;
+      targetY = rect.top;
+
+      active.style.cursor = "grabbing";
+      active.style.zIndex = "1000";
     });
   });
-
-  document.addEventListener("mousemove", e => {
-    if (!activeImg) return;
-
-    // New top-left coordinate based on *mouse position minus grab offset*
-    const newX = e.clientX - grabOffsetX;
-    const newY = e.clientY - grabOffsetY;
 
     // GPU accelerated movement
     activeImg.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
