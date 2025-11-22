@@ -69,16 +69,9 @@ function enableDragging() {
 
   imgs.forEach(img => {
     img.addEventListener("mousedown", e => {
-
-      activeImg = img;
-
-      const rect = img.getBoundingClientRect();
-
-      // ⭐ Correct offset: mouse position inside the image
-      grabOffsetX = e.clientX - rect.left;
-      grabOffsetY = e.clientY - rect.top;
-
-      img.style.transition = "none";
+      active = e.target;
+      offsetX = e.offsetX;
+      offsetY = e.offsetY;
     });
   });
 
