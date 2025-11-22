@@ -100,6 +100,7 @@ function enableDragging() {
     }
   });
 }
+
 // --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
