@@ -1,4 +1,3 @@
-
 /* 1. RESET & GLOBAL VARIABLES */
 :root {
     /* Color Palette */
@@ -67,7 +66,7 @@ html, body {
     margin-bottom: 10px;
 }
 
-#continueBtn {
+#beginBtn {
     margin-top: 25px;
     padding: 10px 25px;
     font-size: 18px;
@@ -79,11 +78,11 @@ html, body {
     transition: background 0.3s ease;
 }
 
-#continueBtn:hover {
+#beginBtn:hover {
     background: var(--dark-blue);
 }
 
-#beginBtn {
+#beginPracticeBtn {
     margin-top: 25px;
     padding: 12px 28px;
     font-size: 18px;
@@ -95,7 +94,7 @@ html, body {
     transition: background 0.3s ease;
 }
 
-#beginBtn:hover {
+#beginPracticeBtn:hover {
     background: var(--dark-blue);
 }
 
