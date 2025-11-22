@@ -32,22 +32,20 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
 ];
 
-const pracImage = [
+const stimuli = [
   "https://via.placeholder.com/80?text=Wolf",
   "https://via.placeholder.com/80?text=Husky",
   "https://via.placeholder.com/80?text=Dog",
+  "https://via.placeholder.com/80?text=Cat",
+  "https://via.placeholder.com/80?text=Tiger"
 ];
 
-let dragging = null
-
 //----Practice image load----
-function loadImages() {
-  const imagesToLoad = pracImage[];
-  
-  //clear pracImage
-     const img = document.createElement("img");
+function loadStimuli() {
+  stimuli.forEach((src,i) => {
+    const img = document.createElement("img");
     img.src = src;
-    img.className = "stimuli";
+    img.className = "stimulus";
     img.style.position = "relative";
     img.style.margin = "5px";
     img.dataset.id = i;
@@ -58,8 +56,9 @@ function loadImages() {
       e.dataTransfer.setData("text/plain", img.dataset.id);
     });
 
-    arenaContainer.appendChild(img);
+    pool.appendChild(img);
   });
+}
 
 // --- Load and display images ---
 function loadImages() {
@@ -178,6 +177,16 @@ function saveCSV() {
   a.click();
 }
 
+// --- Flow control ---
+document.getElementById("beginBtn").addEventListener("click", showscreenQuestion);
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && !arenaVisible) {
+    if (instructions.style.display !== "none") {
+      showscreenQuestion();
+    }
+  }
+  else if (e.code === "Enter" && arenaVisible) endTask();
+});
 
 //show question before arrangement
 function showscreenQuestion() {
