@@ -61,52 +61,45 @@ enableDragging();
 
 // --- Dragging ---
 let activeImg = null;
-let grabOffsetX = 0;
-let grabOffsetY = 0;
+let startX = 0, startY = 0;
+let initialLeft = 0, initialTop = 0;
 
 function enableDragging() {
+
   const imgs = document.querySelectorAll(".image");
 
   imgs.forEach(img => {
-    img.style.position = "absolute";
-    img.style.cursor = "grab";
-
     img.addEventListener("mousedown", e => {
-      e.preventDefault();
-      active = e.currentTarget;
+      activeImg = img;
 
-      const rect = active.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
+      const rect = img.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
 
-      targetX = rect.left;
-      targetY = rect.top;
-
-      active.style.cursor = "grabbing";
-      active.style.zIndex = "1000";
+      startX = e.pageX;
+      startY = e.pageY;
     });
   });
 
-    // GPU accelerated movement
-    activeImg.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
+  document.addEventListener("mousemove", e => {
+    if (!activeImg) return;
+
+    const dx = e.pageX - startX;
+    const dy = e.pageY - startY;
+
+    activeImg.style.left = initialLeft + dx + "px";
+    activeImg.style.top = initialTop + dy + "px";
   });
 
   document.addEventListener("mouseup", () => {
-    if (!activeImg) return;
-
-    const rect = activeImg.getBoundingClientRect();
-    const key = activeImg.src.split("/").pop();
-
-    positions[key] = { x: rect.left, y: rect.top };
-
-    // Lock transform to the final position
-    activeImg.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
-    activeImg.style.transition = "";
-
-    activeImg = null;
+    if (activeImg) {
+      const rect = activeImg.getBoundingClientRect();
+      const key = activeImg.src.split("/").pop();
+      positions[key] = { x: rect.left, y: rect.top };
+      activeImg = null;
+    }
   });
 }
-
 // --- Check inside arena ---
 function isInsideArena(img) {
   const arenaRect = arena.getBoundingClientRect();
