@@ -29,35 +29,35 @@ const imageFiles = [
   "mouse.jpg","ostrich.jpg","palmcockatoo.jpg","partridge.jpg","pelican.jpg",
   "perch.jpg","pigeon.jpg","pike.jpg","porcupine.jpg","prayingmantis.jpg",
   "rabbit.jpg","reindeer.jpg","salmon.jpg","shark.jpg","sheep.jpg","shrimp.jpg",
-  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","turkey copy.jpg","waterbuffalo.jpg"
+  "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-const stimuli = [
-  "https://via.placeholder.com/80?text=Wolf",
-  "https://via.placeholder.com/80?text=Husky",
-  "https://via.placeholder.com/80?text=Dog",
-  "https://via.placeholder.com/80?text=Cat",
-  "https://via.placeholder.com/80?text=Tiger"
-];
+const pracImage = ["herring.jpg","horse.jpg","hyena.jpg"];
 
 //----Practice image load----
-function loadStimuli() {
-  stimuli.forEach((src,i) => {
+function loadImages() {
+  const imagesToLoad = isPrac ? pracImage : imageFiles;
+  
+  //clear pracImage
+  const oldImages = document.querySelectorAll(".image");
+  oldImages.forEach(img => img.remove());
+  
+  imagesToLoad.forEach(file => {
     const img = document.createElement("img");
-    img.src = src;
-    img.className = "stimulus";
-    img.style.position = "relative";
-    img.style.margin = "5px";
-    img.dataset.id = i;
-    img.draggable = true;
+    img.src = imageFolder + file;
+    img.alt = file;
+    img.classList.add("image");
 
-    img.addEventListener("dragstart", (e) => {
-      dragging = img;
-      e.dataTransfer.setData("text/plain", img.dataset.id);
-    });
+    const x = Math.random() * (window.innerWidth * 0.4 - 60);
+    const y = Math.random() * (window.innerHeight - 80);
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
 
-    pool.appendChild(img);
+    arenaContainer.appendChild(img);
   });
+
+  //add dragging after new image
+  enableDragging();
 }
 
 // --- Load and display images ---
