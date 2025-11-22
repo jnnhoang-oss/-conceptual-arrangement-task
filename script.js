@@ -56,29 +56,31 @@ function loadImages() {
 
     arenaContainer.appendChild(img);
   });
-
+enableDragging();
 }
 
 
 // --- Dragging ---
 let activeImg = null;
 let startX = 0, startY = 0;
-let initialLeft = 0, initialTop = 0;
+let initialX = 0, initialY = 0;
 
 function enableDragging() {
-
   const imgs = document.querySelectorAll(".image");
 
   imgs.forEach(img => {
     img.addEventListener("mousedown", e => {
+
       activeImg = img;
 
       const rect = img.getBoundingClientRect();
-      initialLeft = rect.left;
-      initialTop = rect.top;
+      initialX = rect.left;
+      initialY = rect.top;
 
       startX = e.pageX;
       startY = e.pageY;
+
+      img.style.transition = "none"; // remove smoothing during drag
     });
   });
 
@@ -88,15 +90,23 @@ function enableDragging() {
     const dx = e.pageX - startX;
     const dy = e.pageY - startY;
 
-    activeImg.style.left = initialLeft + dx + "px";
-    activeImg.style.top = initialTop + dy + "px";
+    const newX = initialX + dx;
+    const newY = initialY + dy;
+
+    // GPU FAST TRANSFORM
+    activeImg.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
   });
 
   document.addEventListener("mouseup", () => {
     if (activeImg) {
       const rect = activeImg.getBoundingClientRect();
       const key = activeImg.src.split("/").pop();
+
       positions[key] = { x: rect.left, y: rect.top };
+
+      activeImg.style.transition = ""; // restore hover animations
+      activeImg.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0)`;
+
       activeImg = null;
     }
   });
