@@ -49,8 +49,6 @@ function loadImages() {
     img.src = imageFolder + file;
     img.alt = file;
     img.classList.add("image");
-    img.dataset.id = i;
-    img.draggable = true;
 
     const x = Math.random() * (window.innerWidth * 0.4 - 60);
     const y = Math.random() * (window.innerHeight - 80);
@@ -64,30 +62,6 @@ function loadImages() {
   enableDragging();
 }
 
-// --- Load and display images ---
-function loadImages() {
-  imageFiles.forEach(file => {
-    const img = document.createElement("img");
-    img.src = imageFolder + file;
-    img.alt = file;
-    img.classList.add("image");
-    
-    img.addEventListener("dragstart", (e) => {
-      dragging = img;
-      e.dataTransfer.setData("text/plain", img.dataset.id);
-    });
-
-    pool.appendChild(img);
-  });
-
-    const x = Math.random() * (window.innerWidth * 0.4 - 60);
-    const y = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
-
-    arenaContainer.appendChild(img);
-  });
-}
 
 // --- Dragging ---
 let active = null, offsetX = 0, offsetY = 0;
