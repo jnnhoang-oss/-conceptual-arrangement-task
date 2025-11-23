@@ -32,9 +32,7 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-const pracImage = ["pngimg.com - circle_PNG11.png",
-"pngimg.com - circle_PNG23.png",
-"pngimg.com - circle_PNG47.png"];
+const pracImage = ["square.jpg","circle.jpg","oval.jpg"];
 
 // Dragging
 let active = null;
