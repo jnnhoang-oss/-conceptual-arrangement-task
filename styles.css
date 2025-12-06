@@ -1,304 +1,100 @@
-/* 1. RESET & GLOBAL VARIABLES */
 :root {
-    --primary-blue: #0077ff;
-    --dark-blue: #005fd1;
-    --background-gray: #f5f5f5;
-    --text-dark: #222;
-    --arena-border: #ffcc00;
-    --warning-red: #d9534f;
+  --accent: #A9A9A9;
+  --font: Arial, sans-serif;
 }
 
-/* 2. GLOBAL RESET & BASE STYLES */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font);
+  background-color: #f9f9f9;
+  color: #000;
 }
 
-html, body {
-    height: 100%;
-    width: 100%;
-    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    background-color: var(--background-gray);
-    color: var(--text-dark);
-    overflow: hidden;
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-direction: column;
 }
 
-/* 3. SHARED SCREEN LAYOUT */
 .screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    z-index: 10;
-    padding: 40px;
+  display: none;
+  width: 90%;
+  max-width: 700px;
 }
 
-.screen.visible {
-    display: flex;
+.screen.active {
+  display: block;
 }
 
-.content {
-    max-width: 700px;
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+h1, h2 {
+  margin: 0.5em 0;
+  color: var(--accent);
 }
 
-/* 4. SPECIFIC SCREEN STYLES */
-/* 4.1 Instruction Screen */
-#instructions {
-    background-color: #eaf3ff;
+p, li {
+  font-size: 1rem;
 }
 
-#instructions h2 {
-    font-size: 28px;
-    margin-bottom: 15px;
+ul {
+  padding-left: 20px;
 }
 
-#instructions p {
-    font-size: 18px;
-    margin-bottom: 10px;
+.muted {
+  color: #555;
+  font-size: 0.9rem;
 }
 
-#beginBtn,
-#beginPracticeBtn {
-    margin-top: 25px;
-    padding: 12px 28px;
-    font-size: 18px;
-    background: var(--primary-blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.1s ease;
+button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  margin: 10px;
+  background-color: #e6e6e6;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-#beginBtn:hover,
-#beginPracticeBtn:hover {
-    background: var(--dark-blue);
+button:hover {
+  background-color: #d4d4d4;
 }
 
-/* 4.2 Arena Section */
-#arenaContainer {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    display: none;
-    background: #333;
+.img-stage {
+  width: 100%;
+  min-height: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  object-fit: contain;
 }
 
-#arena {
-    position: absolute;
-    top: 50%;
-    right: 5%;
-    transform: translateY(-50%);
-    width: 800px;
-    height: 800px;
-    border: 3px dashed var(--arena-border);
-    border-radius: 50%;
-    background: rgba(255,255,255,0.05);
+.choice, .rating-option {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #e6e6e6;
+  border-radius: 4px;
 }
 
-#arenaText {
-    position: absolute;
-    min-width: 300px;
-    top: 20px;
-    left: 10px;
-    font-size: 18px;
-    color: white;
+.choice:hover, .rating-option:hover {
+  background-color: #d4d4d4;
 }
 
-#timerDisplay {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 18px;
-    color: #fff;
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 
-#warningMessage {
-    position: absolute;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--warning-red);
-    font-weight: bold;
-    display: none;
-    animation: subtleFloat 1.5s infinite;
+.toolbar {
+  display: none; 
 }
-
-/* 4.3 Image Styles */
-.image {
-    position: absolute; /* fixed removed for correct drag positions */
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    cursor: grab;
-    user-select: none;
-    opacity: 0.85;
-    transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
-}
-
-.image:hover {
-    opacity: 0.95;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
-}
-
-.image:active {
-    cursor: grabbing;
-    transform: scale(1.1);
-    opacity: 1;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-}
-
-/* 4.4 Questions Section */
-#questions {
-    background-color: #fffbe6;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.question {
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    max-width: 600px;
-    text-align: center;
-}
-
-.question h2 {
-    margin-bottom: 25px;
-    font-size: 22px;
-    line-height: 1.4;
-    color: #333;
-}
-
-.question button {
-    margin: 10px;
-    padding: 10px 25px;
-    font-size: 18px;
-    background-color: var(--primary-blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    min-width: 100px;
-}
-
-.question button:hover {
-    background-color: var(--dark-blue);
-}
-
-/* 4.5 End Screen */
-#endScreen {
-    background: #e9fce9;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-#endScreen .content {
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    text-align: center;
-    max-width: 700px;
-}
-
-#endScreen h2 {
-    font-size: 26px;
-    color: #007700;
-}
-
-.thank-you-note {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #333;
-    line-height: 1.5;
-}
-
-/* 5. ANIMATIONS & TRANSITIONS */
-@keyframes subtleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.screen, button {
-    transition: all 0.3s ease-in-out;
-}
-
-/* 6. ACCESSIBILITY & FOCUS STATES */
-button:focus-visible {
-    outline: 3px solid var(--primary-blue);
-    outline-offset: 2px;
-}
-
-.image:focus-visible {
-    outline: 3px solid var(--arena-border);
-    outline-offset: 2px;
-}
-
-button:focus,
-input:focus {
-    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.4);
-}
-
-/* 7. RESPONSIVE DESIGN */
-@media screen and (max-width: 1024px) {
-    #arena {
-        width: 600px;
-        height: 600px;
-        right: 2%;
-    }
-
-    .image {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .screen { padding: 20px; }
-    .content { padding: 25px; max-width: 95%; }
-
-    #arena {
-        width: 400px;
-        height: 400px;
-        position: relative;
-        margin: 0 auto;
-        right: auto;
-        top: auto;
-        transform: none;
-    }
-
-    #arenaText, #timerDisplay {
-        position: relative;
-        left: 0;
-        right: auto;
-        top: auto;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-}
-
-/* 8. PRINT & RTL */
-@media print {
-    body * { visibility: hidden; }
-    #endScreen, #endScreen * { visibility: visible; }
-    #endScreen { position: absolute; left: 0; top: 0; }
-}
-
-html[dir="rtl"] .screen { direction: rtl; }
