@@ -1,96 +1,111 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conceptual Arrangement Task</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>nmph_mtest_TI — Surprise Memory Test</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <main class="container">
 
-  <!-- 🟢 Instruction Screen -->
-  <div id="instructions" class="screen visible">
-    <div class="content">
-      <h2>Conceptual Arrangement Task</h2>
-      <p>
-        In this task, you will click and drag images around the screen.
-        Move all images into the circular arena and place conceptually similar items closer together.
-      </p>
-      <p>
-        After one round of arrangement, you might notice that you form several clusters of similar images.
-        Please remember both the distances within the clusters and between the clusters are significant.
-      </p>
-      <p>
-        For example: if you have images of a circle, an oval, and a square, you might place the circle and oval closer together,
-        while placing the square farther away from both. 
-      </p>
-      <p>Press the <b>SPACEBAR</b> or click below to begin.</p>
-      <button id="beginBtn">Begin</button>
-    </div>
-  </div>
+    <!-- ID Screen -->
+    <section id="idScreen" class="screen active">
+      <h2>Welcome</h2>
+      <label for="subid">Participant ID</label>
+      <input id="subid" type="text" placeholder="e.g., p101" />
+      <p class="muted small">Press <strong>Enter</strong> to continue</p>
+    </section>
 
-  <!-- screen question -->
-  <div id="screenQuestion" class="screen">
-    <div class="content">
-      <div class="question">
-        <h2>Did you open full screen?</h2>
-        <button onclick="recordFullscreenAnswer('Yes')">Yes</button>
-        <button onclick="recordFullscreenAnswer('No')">No</button>
+    <!-- Instructions Screen -->
+    <section id="instructionsScreen" class="screen">
+      <h2>Important Instructions</h2>
+      <p>Read carefully and stay fully engaged. Press <strong>Enter</strong> to continue.</p>
+    </section>
+
+    <!-- Memory Test Instructions Screen -->
+    <section id="memoryInstructionsScreen" class="screen">
+      <h2>Memory Test Instructions</h2>
+      <p>You will see old and new images for 2 seconds each. Press <strong>F</strong> if NEW, <strong>J</strong> if OLD, then rate your confidence (1-5). Press <strong>Enter</strong> to continue.</p>
+    </section>
+
+    <!-- Pre-test Question 1 -->
+    <section id="question1Screen" class="screen">
+      <h2>Pre-Test Question 1</h2>
+      <p>Have you anticipated that you will be having a memory test today?</p>
+      <div id="q1Scale" class="rating-scale">
+        <div class="rating-option" data-value="1">1</div>
+        <div class="rating-option" data-value="2">2</div>
+        <div class="rating-option" data-value="3">3</div>
+        <div class="rating-option" data-value="4">4</div>
+        <div class="rating-option" data-value="5">5</div>
       </div>
-    </div>
-  </div>
+      <div class="rating-labels">
+        <span>Not at all</span>
+        <span>Very much</span>
+      </div>
+    </section>
 
-  <!-- prac round -->
-  <div id="pracInstructions" class="screen">
-    <div class="content">
-      <h1>Practice Round</h1>
-      <p>Let's practice.</p>
-      <p>Please drag <strong>the 3 images</strong> to the circle.</p>
-      <p>Arrange them <strong>so more similar ones</strong> are placed closer.</p>
-      <p>Press <strong>Enter</strong> when finished.</p>
-      <button id="beginPracticeBtn" onclick="beginPractice()">Start practice</button>
-    </div>
-  </div>
+    <!-- Pre-test Question 2 -->
+    <section id="question2Screen" class="screen">
+      <h2>Pre-Test Question 2</h2>
+      <p>Have you been thinking about the images you previously arranged?</p>
+      <div id="q2Scale" class="rating-scale">
+        <div class="rating-option" data-value="1">1</div>
+        <div class="rating-option" data-value="2">2</div>
+        <div class="rating-option" data-value="3">3</div>
+        <div class="rating-option" data-value="4">4</div>
+        <div class="rating-option" data-value="5">5</div>
+      </div>
+      <div class="rating-labels">
+        <span>Not at all</span>
+        <span>Very much</span>
+      </div>
+    </section>
 
-  <!-- 🟣 Main Arena Container -->
-  <div id="arenaContainer" class="screen">
-    <div id="arena"></div>
-    <div id="arenaText">
-      <p>Click and drag images. Arrange images, placing conceptually similar ones closer.</p>
-      <p>Both the distances within the clusters and between the clusters are significant.</p>
-      <p>Press ENTER when finished.</p>
-    </div>
-    <div id="warningMessage">⚠ Please move all images inside the arena before continuing.</div>
-    <div id="timerDisplay">Total Time: <span id="totalTime">0</span>s</div>
-  </div>
+    <!-- Ready Screen -->
+    <section id="readyScreen" class="screen">
+      <h2>Ready to Begin</h2>
+      <p>Press <strong>Enter</strong> to start the memory test</p>
+    </section>
 
-  <!-- 🟡 Questions -->
-  <div id="questions" class="screen">
-    <div id="q1" class="question">
-      <h2>Did you pay attention (BE HONEST)?</h2>
-      <button onclick="recordAnswer('attention','Yes')">Yes</button>
-      <button onclick="recordAnswer('attention','No')">No</button>
-    </div>
+    <!-- Image Screen -->
+    <section id="imageScreen" class="screen">
+      <div class="img-stage" id="imgStage">+</div>
+    </section>
 
-    <div id="q2" class="question" style="display:none;">
-      <h2>Are you using the same device as the first time?</h2>
-      <button onclick="recordAnswer('device','Yes')">Yes</button>
-      <button onclick="recordAnswer('device','No')">No</button>
-    </div>
-  </div>
+    <!-- Choice Screen -->
+    <section id="choiceScreen" class="screen">
+      <p>Was the image NEW or OLD?</p>
+      <div class="choice"><strong>F</strong> — NEW</div>
+      <div class="choice"><strong>J</strong> — OLD</div>
+    </section>
 
-  <!-- 🔵 End Screen -->
-  <div id="endScreen" class="screen">
-    <div class="content">
-      <h2>Thank you for participating!</h2>
-      <p>Your responses have been recorded and downloaded as a CSV file.</p>
-      <p class="thank-you-note">
-        We sincerely appreciate your time and effort in completing this task.
-        Your participation helps advance our understanding of conceptual arrangements.
-      </p>
-    </div>
-  </div>
+    <!-- Confidence Screen -->
+    <section id="confidenceScreen" class="screen">
+      <p>How confident are you? (1 = not confident, 5 = very confident)</p>
+      <div class="rating-scale">
+        <div class="rating-option" data-value="1">1</div>
+        <div class="rating-option" data-value="2">2</div>
+        <div class="rating-option" data-value="3">3</div>
+        <div class="rating-option" data-value="4">4</div>
+        <div class="rating-option" data-value="5">5</div>
+      </div>
+    </section>
 
+    <!-- Feedback Screen -->
+    <section id="feedbackScreen" class="screen">
+      <h1 id="feedbackText">Correct!</h1>
+    </section>
+
+    <!-- End Screen -->
+    <section id="endScreen" class="screen">
+      <h2>Experiment Complete!</h2>
+      <p>Thank you for your participation!</p>
+      <p>Your data has been automatically downloaded.</p>
+    </section>
+
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
