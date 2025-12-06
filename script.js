@@ -1,26 +1,10 @@
-const arenaContainer = document.getElementById("arenaContainer");
-const arena = document.getElementById("arena");
-const instructions = document.getElementById("instructions");
-const questions = document.getElementById("questions");
-const endScreen = document.getElementById("endScreen");
-const totalTimeDisplay = document.getElementById("totalTime");
-const warningMessage = document.getElementById("warningMessage");
-const screenQuestion = document.getElementById("screenQuestion");
-const pracInstructions = document.getElementById("pracInstructions");
+// ------------------------
+// Complete Memory Task Script with All Screens
+// ------------------------
 
-let participantID = prompt("Enter Participant ID:") || "P1";
-let startTime, timerInterval;
-let attentionAnswer = "", deviceAnswer = "";
-let fullscreenAnswer = "";
-let sleepAnswers = {};
-let positions = {};
-let totalSeconds = 0;
-let arenaVisible = false;
-let isPrac = false;
-
-// Your image folder
-const imageFolder = ".github/wth/";
-const imageFiles = [
+// Folders and images
+const oldImageFolder = "oldpics/";
+const oldImages = [
   "aardvark.jpg","anteater.jpg","brown_bear.jpg","camel.jpg","canary.jpg",
   "carp.jpg","caterpillarhawkmoth.jpg","catfish.jpg","chipmunk.jpg","cranebug.jpg",
   "cricket.jpg","elephantafrican.jpg","finch.jpg","firebug.jpg","flea.jpg",
@@ -32,318 +16,135 @@ const imageFiles = [
   "skunk.jpg","snail.jpg","starfish.jpg","tiger.jpg","turkey.jpg","waterbuffalo.jpg"
 ];
 
-const pracImage = ["square.jpg","circle.jpg","oval.jpg"];
-
-// Dragging
-let active = null;
-let offsetX = 0, offsetY = 0;
-let targetX = 0, targetY = 0;
-let dragRafId = null; 
-let dragDocListenersBound = false;
-
-function enableDragging() {
-  const imgs = document.querySelectorAll(".image");
-
-  imgs.forEach(img => {
-    img.style.position = "absolute";
-    img.style.cursor = "grab";
-
-    img.addEventListener("mousedown", e => {
-      e.preventDefault();
-      active = e.currentTarget;
-
-      const rect = active.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-
-      targetX = rect.left;
-      targetY = rect.top;
-
-      active.style.cursor = "grabbing";
-      active.style.zIndex = "1000";
-    });
-  });
-
-  if (!dragDocListenersBound) {
-    document.addEventListener("mousemove", e => {
-      if (!active) return;
-      e.preventDefault();
-
-      targetX = e.clientX - offsetX;
-      targetY = e.clientY - offsetY;
-
-      if (!dragRafId) {
-        dragRafId = requestAnimationFrame(updateDragPosition);
-      }
-    });
-
-    document.addEventListener("mouseup", () => {
-      if (!active) return;
-
-      //only record actual round
-      if (!isPrac) {
-        const rect = active.getBoundingClientRect();
-        const key = active.src.split("/").pop();
-        positions[key] = { x: rect.left, y: rect.top };
-      }
-
-      active.style.cursor = "grab";
-      active.style.zIndex = "1";
-      active = null;
-    });
-
-    dragDocListenersBound = true;
-  }
-}
-
-function updateDragPosition() {
-  if (active) {
-    active.style.left = `${targetX}px`;
-    active.style.top = `${targetY}px`;
-  }
-  dragRafId = null;
-}
-
-// --- Load and display images ---
-function loadImages() {
-  const imagesToLoad = isPrac ? pracImage : imageFiles;
-  
-  //clear pracImage
-  const oldImages = document.querySelectorAll(".image");
-  oldImages.forEach(img => img.remove());
-  
-  imagesToLoad.forEach(file => {
-    const img = document.createElement("img");
-    img.src = imageFolder + file;
-    img.alt = file;
-    img.classList.add("image");
-
-    const x = Math.random() * (window.innerWidth * 0.4 - 60);
-    const y = Math.random() * (window.innerHeight - 80);
-    img.style.left = `${x}px`;
-    img.style.top = `${y}px`;
-
-    arenaContainer.appendChild(img);
-  });
-
-  //add dragging after new image
-  enableDragging();
-}
-
-// --- Timer ---
-function startTimer() {
-  // clear previous timer
-  if (timerInterval) clearInterval(timerInterval);
-  
-  startTime = new Date();
-  totalSeconds = 0;
-  timerInterval = setInterval(() => {
-    totalSeconds = Math.floor((new Date() - startTime) / 1000);
-    totalTimeDisplay.textContent = totalSeconds;
-  }, 1000);
-}
-
-// --- Check inside arena ---
-function isInsideArena(img) {
-  const arenaRect = arena.getBoundingClientRect();
-  const centerX = arenaRect.left + arenaRect.width / 2;
-  const centerY = arenaRect.top + arenaRect.height / 2;
-  const radius = arenaRect.width / 2;
-
-  const imgRect = img.getBoundingClientRect();
-  const imgCenterX = imgRect.left + imgRect.width / 2;
-  const imgCenterY = imgRect.top + imgRect.height / 2;
-
-  const dx = imgCenterX - centerX;
-  const dy = imgCenterY - centerY;
-  return Math.sqrt(dx * dx + dy * dy) + imgRect.width / 2 < radius;
-}
-
-function allImagesInside() {
-  return Array.from(document.querySelectorAll(".image")).every(isInsideArena);
-}
-
-// --- Save CSV ---
-function saveCSV() {
-  const createdAt = new Date().toLocaleString("en-US", {
-  timeZone: "America/New_York"
-  });
-  let csv = `created_at,${createdAt}\n`;
-  csv += "ParticipantID,Time,Fullscreen,Attention,Device,Image,X,Y";
-  // Add GSQS columns (as strings: Yes/No)
-  for (let i = 1; i <= 15; i++) csv += `,GSQS_Q${i}`;
-  csv += ",GSQS_Total\n";
-
-  // Calculate GSQS total (count "Yes" answers)
-  let gsqsTotal = 0;
-  for (let i = 1; i <= 15; i++) {
-    if (sleepAnswers[i] === "Yes") gsqsTotal++;
-  }
-
-  // Add each image position
-  for (let key in positions) {
-    const p = positions[key];
-    csv += `${participantID},${totalSeconds},${fullscreenAnswer},${attentionAnswer},${deviceAnswer},${key},${p.x},${p.y}`;
-    
-    // Add GSQS answers as strings (Yes/No)
-    for (let i = 1; i <= 15; i++) {
-      csv += `,${sleepAnswers[i] || ""}`;
-    }
-    
-    // Add GSQS total score
-    csv += `,${gsqsTotal}\n`;
-  }
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `arrangement_${participantID}.csv`;
-  a.click();
-}
-
-// --- Flow control ---
-document.getElementById("beginBtn").addEventListener("click", showscreenQuestion);
-document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !arenaVisible) {
-    if (instructions.style.display !== "none") {
-      showscreenQuestion();
-    }
-  }
-  else if (e.code === "Enter" && arenaVisible) endTask();
-});
-
-//show question before arrangement
-function showscreenQuestion() {
-  instructions.classList.remove("visible");
-  instructions.style.display = "none";
-  screenQuestion.classList.add("visible");
-  screenQuestion.style.display = "flex";
-}
-
-//record screen question
-function recordFullscreenAnswer(answer) {
-  fullscreenAnswer = answer;
-  screenQuestion.classList.remove("visible");
-  screenQuestion.style.display = "none";
-  pracInstructions.classList.add("visible");
-  pracInstructions.style.display = "flex";
-}
-
-//start prac
-function beginPractice() {
-  pracInstructions.classList.remove("visible");
-  pracInstructions.style.display = "none";
-  isPrac = true;
-  startTask();
-}
-
-//start actual
-function startTask() {
-  arenaContainer.classList.add("visible");
-  arenaContainer.style.display = "block";
-  loadImages();   
-  startTimer();
-  arenaVisible = true;
-}
-
-function endTask() {
-  const imgs = document.querySelectorAll(".image");
-  
-  if (!isPrac) {
-    imgs.forEach(img => {
-      const rect = img.getBoundingClientRect();
-      const key = img.src.split("/").pop();
-      positions[key] = { x: rect.left, y: rect.top };
-    });
-  }
-
-  if (allImagesInside()) {
-    warningMessage.style.display = "none";
-    arenaVisible = false;
-    
-    if (isPrac) {
-      clearInterval(timerInterval);
-      isPrac = false;
-      
-      alert("Practice complete! Press OK to begin the actual arrangement task.");
-      startTask(); 
-    } else {
-      arenaContainer.classList.remove("visible");
-      arenaContainer.style.display = "none";
-      clearInterval(timerInterval);
-      questions.classList.add("visible");
-      questions.style.display = "flex";
-    }
-  } else {
-    warningMessage.style.display = "block";
-  }
-}
-
-// --- Question logic ---
-function recordAnswer(type, answer) {
-  if (type === "attention") {
-    attentionAnswer = answer;
-    document.getElementById("q1").style.display = "none";
-    document.getElementById("q2").style.display = "block";
-  } else if (type === "device") {
-    deviceAnswer = answer;
-    document.getElementById("q2").style.display = "none";
-    showSleepQuestionnaire();
-  }
-}
-
-// --- Groningen Sleep Questionnaire ---
-const gsqsQuestions = [
-  "I had a deep sleep last night",
-  "I feel that I slept poorly last night",
-  "It took me more than half an hour to fall asleep last night",
-  "I woke up several times last night",
-  "I felt tired after waking up this morning",
-  "I feel that I didn't get enough sleep last night",
-  "I got up in the middle of the night",
-  "I felt rested after waking up this morning",
-  "I feel that I only had a couple of hours' sleep last night",
-  "I feel that I slept well last night",
-  "I didn't sleep a wink last night",
-  "I didn't have trouble falling asleep last night",
-  "After I woke up last night, I had trouble falling asleep again",
-  "I tossed and turned all night last night",
-  "I didn't get more than 5 hours' sleep last night"
+const newImageFolder = "newpic/";
+const newImages = [
+ "alligator.jpg", "angelfish.jpg","ant.jpg","armadillo.jpg","assassinbug.jpg",
+  "baboon.jpg","badger.jpg","baldeagle.jpg","bat.jpg","beaver.jpg","bluejay.jpg","boar.jpg",
+"bull.jpg","butterfly.jpg","cardinal.jpg","caribou.jpg","cat.jpg","caterpillarpeacockmoth.jpg",
+  "cedarwaxwing.jpg","chameleon.jpg","cheetah.jpg","chimpanzee.jpg","clownfish.jpg","cobra.jpg","cockroach.jpg","cougar.jpg","cow.jpg","crab.jpg","crow.jpg","dolphin.jpg",
+"dragonfly.jpg","dramaderry.jpg","duck.jpg","eagle.jpg","fennec.jpg","flamingo.jpg","gecko.jpg","gorilla.jpg",
+"hummingbird.jpg","mahimahi.jpg","mink.jpg","mole.jpg","quail.jpg","racoon.jpg","rhino.jpg","seal.jpg","snapper.jpg","zebra.jpg"
 ];
 
-function showSleepQuestionnaire() {
-  questions.innerHTML = "";
-  let index = 0;
+// Build and shuffle trials
+let trials = [];
+oldImages.forEach(img => trials.push({img: oldImageFolder + img, old: 1}));
+newImages.forEach(img => trials.push({img: newImageFolder + img, old: 0}));
+function shuffle(array){for(let i=array.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[array[i],array[j]]=[array[j],array[i]];}}shuffle(trials);
 
-  const qDiv = document.createElement("div");
-  qDiv.className = "question";
+// ------------------------
+// Variables
+// ------------------------
+let trialIndex = 0;
+let preTestQ1 = null;
+let preTestQ2 = null;
+let responses = [];
+let itiDuration = 0;
 
-  const qText = document.createElement("h2");
-  qText.textContent = gsqsQuestions[index];
-  qDiv.appendChild(qText);
+// ------------------------
+// DOM Elements
+// ------------------------
+const screens = {
+  id: document.getElementById('idScreen'),
+  instructions: document.getElementById('instructionsScreen'),
+  memoryInstructions: document.getElementById('memoryInstructionsScreen'),
+  question1: document.getElementById('question1Screen'),
+  question2: document.getElementById('question2Screen'),
+  ready: document.getElementById('readyScreen'),
+  image: document.getElementById('imageScreen'),
+  choice: document.getElementById('choiceScreen'),
+  confidence: document.getElementById('confidenceScreen'),
+  feedback: document.getElementById('feedbackScreen'),
+  end: document.getElementById('endScreen')
+};
+const imgStage = document.getElementById('imgStage');
 
-  const yesBtn = document.createElement("button");
-  const noBtn = document.createElement("button");
-  yesBtn.textContent = "Yes";
-  noBtn.textContent = "No";
+// ------------------------
+// Show screen function
+// ------------------------
+function showScreen(screenName){for(let key in screens){screens[key].classList.remove('active');}screens[screenName].classList.add('active');}
 
-  yesBtn.onclick = () => nextGSQS("Yes");
-  noBtn.onclick = () => nextGSQS("No");
+// ------------------------
+// ID Screen
+// ------------------------
+document.getElementById('subid').addEventListener('keydown',e=>{if(e.key==='Enter') showScreen('instructions');});
 
-  qDiv.appendChild(yesBtn);
-  qDiv.appendChild(noBtn);
-  questions.appendChild(qDiv);
-  questions.style.display = "flex";
-
-  function nextGSQS(answer) {
-    sleepAnswers[index + 1] = answer;
-    index++;
-    if (index < gsqsQuestions.length) {
-      qText.textContent = gsqsQuestions[index];
-    } else {
-      questions.style.display = "none";
-      endScreen.style.display = "flex";
-      saveCSV();
-    }
+// ------------------------
+// Instructions Screens
+// ------------------------
+document.addEventListener('keydown', e => {
+  if(e.key==='Enter'){
+    if(screens.instructions.classList.contains('active')) showScreen('memoryInstructions');
+    else if(screens.memoryInstructions.classList.contains('active')) showScreen('question1');
+    else if(screens.ready.classList.contains('active')) runTrial();
   }
+});
+
+// ------------------------
+// Pre-test Questions
+// ------------------------
+document.getElementById('q1Scale').addEventListener('click', e => {if(e.target.classList.contains('rating-option')){preTestQ1 = e.target.dataset.value; showScreen('question2');}});
+document.getElementById('q2Scale').addEventListener('click', e => {if(e.target.classList.contains('rating-option')){preTestQ2 = e.target.dataset.value; showScreen('ready');}});
+
+// ------------------------
+// Memory Task Functions
+// ------------------------
+function randomITI(){return 1000+Math.random()*500;}
+
+function runTrial(){
+  if(trialIndex>=trials.length) return endExperiment();
+  itiDuration=randomITI();
+  imgStage.textContent='+';
+  showScreen('image');
+  setTimeout(showImage, itiDuration);
+}
+
+function showImage(){
+  const t = trials[trialIndex];
+  imgStage.style.backgroundImage=`url(${t.img})`;
+  imgStage.style.backgroundSize='contain';
+  imgStage.style.backgroundRepeat='no-repeat';
+  imgStage.style.backgroundPosition='center';
+  setTimeout(()=>{showScreen('choice'); startChoice(t);},2000);
+}
+
+function startChoice(currentTrial){
+  document.onkeydown = e=>{
+    if(['f','j'].includes(e.key.toLowerCase())){
+      currentTrial.choice=(e.key.toLowerCase()==='f')?'New':'Old';
+      showScreen('confidence');
+      startConfidence(currentTrial);
+    }
+  };
+}
+
+function startConfidence(currentTrial){
+  document.onkeydown = e=>{
+    if(['1','2','3','4','5'].includes(e.key)){
+      currentTrial.confidence=e.key;
+      currentTrial.preTestQ1=preTestQ1;
+      currentTrial.preTestQ2=preTestQ2;
+      currentTrial.iti=itiDuration;
+      responses.push(currentTrial);
+      showScreen('feedback');
+      document.getElementById('feedbackText').textContent = currentTrial.choice===((currentTrial.old===1)?'Old':'New')?'Correct!':'Incorrect';
+      trialIndex++;
+      setTimeout(runTrial,800);
+    }
+  };
+}
+
+// ------------------------
+// End Experiment
+// ------------------------
+function endExperiment(){
+  showScreen('end');
+  let csv='image,old,choice,confidence,preTestQ1,preTestQ2,iti\n';
+  responses.forEach(r=>csv+=`${r.img},${r.old},${r.choice},${r.confidence},${r.preTestQ1},${r.preTestQ2},${r.iti}\n`);
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='memory_test.csv';
+  a.click();
 }
